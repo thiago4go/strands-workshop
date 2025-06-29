@@ -1,0 +1,18 @@
+# AWS Strands AI Agents Workshop Dependencies
+
+# Core Strands SDK
+strands-agents>=0.1.9
+
+# Provider-specific dependencies
+strands-agents[openai]>=0.1.9
+strands-agents[litellm]>=0.1.9
+
+# Tools and utilities
+strands-agents-tools>=0.1.7
+
+# MCP Integration (Official SDK)
+mcp[cli]>=1.9.4
+
+# Additional utilities for workshop
+python-dotenv>=1.0.0
+rich>=14.0.0
