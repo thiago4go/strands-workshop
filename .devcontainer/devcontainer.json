@@ -1,41 +1,53 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/ubuntu
 {
-	"name": "Ubuntu",
-	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "mcr.microsoft.com/devcontainers/base:jammy",
-	"features": {
-		"ghcr.io/devcontainers/features/aws-cli:1": {},
-		"ghcr.io/devcontainers-extra/features/gh-cli:1": {},
-		"ghcr.io/devcontainers/features/docker-in-docker:2": {},
-		"ghcr.io/devcontainers/features/node:1": {},
-		"ghcr.io/devcontainers/features/python:1": {},
-		"ghcr.io/eitsupi/devcontainer-features/jq-likes:2": {},
-		"ghcr.io/devcontainers-extra/features/aws-cdk:2": {},
-		"ghcr.io/devcontainers-extra/features/curl-apt-get:1": {},
-		"ghcr.io/devcontainers-extra/features/wget-apt-get:1": {},
-	},
-	 "mounts": [
-    "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
-  	],
-	"postCreateCommand": {
-		"q-install": "ARCH=$(uname -m); if [ \"$ARCH\" = \"aarch64\" ] || [ \"$ARCH\" = \"arm64\" ]; then DOWNLOAD_URL='https://desktop-release.q.us-east-1.amazonaws.com/latest/q-aarch64-linux.zip'; else DOWNLOAD_URL='https://desktop-release.q.us-east-1.amazonaws.com/latest/q-x86_64-linux.zip'; fi && curl --proto '=https' --tlsv1.2 -sSf \"$DOWNLOAD_URL\" -o 'q.zip' && unzip q.zip && sudo mv ./q/bin/q /usr/local/bin/ && sudo mv ./q/bin/qchat /usr/local/bin/ && sudo mv ./q/bin/qterm /usr/local/bin/ && rm -rf q.zip q && rm -rf ./q",
-		"set alias for qchat": "echo 'alias q=\"/usr/local/bin/qchat\"' >> ~/.bashrc  && echo 'alias q=\"/usr/local/bin/qchat\"' >> ~/.bash_profile && echo 'alias q=\"/usr/local/bin/qchat\"' >> ~/.zshrc && echo 'alias q=\"/usr/local/bin/qchat\"' >> ~/.profile",
-		"install strands sdk": "pip install strands-agents strands-agents-builder strands-agents[a2a] strands-agents[openai] strands-agents[litellm] strands-agents-tools a2a-sdk strands-nvidia-nim"
-	}
+  "name": "Ubuntu",
+  // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+  "image": "mcr.microsoft.com/devcontainers/base:jammy",
 
-	// Features to add to the dev container. More info: https://containers.dev/features.
-	// "features": {},
+  "features": {
+    "ghcr.io/devcontainers/features/aws-cli:1": {},
+    "ghcr.io/devcontainers-extra/features/gh-cli:1": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/node:1": {},
+    "ghcr.io/devcontainers/features/python:1": {},
+    "ghcr.io/eitsupi/devcontainer-features/jq-likes:2": {},
+    "ghcr.io/devcontainers-extra/features/aws-cdk:2": {},
+    "ghcr.io/devcontainers-extra/features/curl-apt-get:1": {},
+    "ghcr.io/devcontainers-extra/features/wget-apt-get:1": {}
+  },
 
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [],
+  "mounts": [
+ 	// Mount the local .ssh directory to the container for SSH access
+	// Uncomment the line below if you want to mount your local .ssh directory
+	// "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
+	// Note: Ensure that your local .ssh directory has the correct permissions set
+	// and that you have added your SSH keys to the ssh-agent.
+  ],
 
-	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "uname -a",
+  // Use 'forwardPorts' to expose ports (e.g., 3000 for MCP Inspector UI)
+  "forwardPorts": [3000],
 
-	// Configure tool-specific properties.
-	// "customizations": {},
+  "postCreateCommand": {
+    // Install Q CLI
+    "q-install": "ARCH=$(uname -m); if [ \"$ARCH\" = \"aarch64\" ] || [ \"$ARCH\" = \"arm64\" ]; then DOWNLOAD_URL='https://desktop-release.q.us-east-1.amazonaws.com/latest/q-aarch64-linux.zip'; else DOWNLOAD_URL='https://desktop-release.q.us-east-1.amazonaws.com/latest/q-x86_64-linux.zip'; fi && curl --proto '=https' --tlsv1.2 -sSf \"$DOWNLOAD_URL\" -o 'q.zip' && unzip q.zip && sudo mv ./q/bin/q /usr/local/bin/ && sudo mv ./q/bin/qchat /usr/local/bin/ && sudo mv ./q/bin/qterm /usr/local/bin/ && rm -rf q.zip q",
 
-	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-	// "remoteUser": "root"
+    // Set alias for qchat
+    "set alias for qchat": "echo 'alias q=\"/usr/local/bin/qchat\"' >> ~/.bashrc && echo 'alias q=\"/usr/local/bin/qchat\"' >> ~/.bash_profile && echo 'alias q=\"/usr/local/bin/qchat\"' >> ~/.zshrc && echo 'alias q=\"/usr/local/bin/qchat\"' >> ~/.profile",
+
+    // Install Strands SDK, MCP CLI, and workshop utilities
+    "install strands sdk": "pip install strands-agents strands-agents[openai] strands-agents[litellm] strands-agents-tools strands-agents-builder a2a-sdk strands-nvidia-nim mcp[cli] fastmcp python-dotenv rich",
+
+    // Setup MCP Inspector UI
+    "setup mcp inspector": "git clone https://github.com/modelcontextprotocol/inspector.git /home/vscode/inspector && cd /home/vscode/inspector && npm install",
+
+    // (Optional) Run MCP Inspector in background—invoke manually with 'npm run dev'
+    // "run mcp inspector": "cd /home/vscode/inspector && npm run dev &"
+  }
+
+  // Configure VS Code extensions
+  // "customizations": { "vscode": { "extensions": [ ... ] }}
+
+  // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+  // "remoteUser": "root"
 }
