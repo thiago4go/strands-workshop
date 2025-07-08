@@ -77,10 +77,46 @@ python -u exercise1-hello-agent.py
 Agentic AI refers to artificial intelligence systems that can act autonomously, make decisions, and take actions to achieve goals. Unlike traditional AI that simply responds to prompts, agentic AI can plan, reason, use tools, and interact with environments to complete complex tasks independently and adaptively.
 ```
 
-### Step 5: Enhanced Agent with Explicit Configuration
+### Step 5: BONUS - Simple Multi-Provider Agent
 
-Create `exercise1-enhanced.py` with explicit Bedrock configuration:
+**NEW!** Try different AI providers with this simple exercise:
 
+```bash
+python -u exercise1-simple-multi-provider.py
+```
+
+This exercise lets you use **any AI provider you have access to**:
+
+- **AWS Bedrock** (if you have AWS credentials)
+- **OpenAI** (if you have OpenAI API key)  
+- **NVIDIA NIM** (free tier available!)
+- **OpenRouter** (free tier available!)
+
+**Why this matters:**
+- Strands works with multiple AI providers
+- You can choose based on cost, performance, or availability
+- No vendor lock-in - switch providers easily
+
+**Quick setup for free options:**
+```bash
+# NVIDIA NIM (free tier)
+pip install 'strands-agents[litellm]'
+# Get free key from https://build.nvidia.com/
+export NVIDIA_API_KEY="nvapi-..."
+
+# OpenRouter (free tier)  
+pip install 'strands-agents[litellm]'
+# Get free key from https://openrouter.ai/keys
+export OPENROUTER_API_KEY="sk-or-..."
+```
+
+The exercise will automatically detect what you have configured and let you choose!
+
+### Step 6: Enhanced Agent with Explicit Configuration
+
+Create `exercise1-enhanced.py` with explicit model configuration. Here are examples for different providers:
+
+#### Option A: AWS Bedrock Configuration
 ```python
 from strands import Agent
 from strands.models import BedrockModel
@@ -109,7 +145,103 @@ for question in questions:
     print(f"A: {response}\n")
 ```
 
-### Step 6: Add Debug Logging
+#### Option B: OpenAI Configuration
+```python
+import os
+from strands import Agent
+from strands.models.openai import OpenAIModel
+
+# First, install OpenAI support: pip install 'strands-agents[openai]'
+# Set your API key: export OPENAI_API_KEY="sk-..."
+
+# Create an OpenAI model with explicit configuration
+openai_model = OpenAIModel(
+    client_args={
+        "api_key": os.getenv("OPENAI_API_KEY"),
+    },
+    model_id="gpt-4o-mini",  # Cost-effective option
+    params={
+        "temperature": 0.3,
+        "max_tokens": 200,
+    }
+)
+
+# Create agent with the configured model
+agent = Agent(model=openai_model)
+
+# Test with the same questions
+questions = [
+    "What is the capital of France?",
+    "Explain machine learning in one sentence.",
+    "What's 15 * 23?"
+]
+
+for question in questions:
+    print(f"Q: {question}")
+    response = agent(question)
+    print(f"A: {response}\n")
+```
+
+#### Option C: NVIDIA NIM Configuration (Free Tier)
+```python
+import os
+from strands import Agent
+from strands.models.litellm import LiteLLMModel
+
+# First, install LiteLLM support: pip install 'strands-agents[litellm]'
+# Get free API key from: https://build.nvidia.com/
+# Set your API key: export NVIDIA_API_KEY="nvapi-..."
+
+# Create an NVIDIA NIM model with explicit configuration
+nvidia_model = LiteLLMModel(
+    client_args={
+        "api_key": os.getenv("NVIDIA_API_KEY"),
+    },
+    model_id="nvidia/meta/llama3-8b-instruct",
+    params={
+        "temperature": 0.3,
+        "max_tokens": 200,
+    }
+)
+
+# Create agent with the configured model
+agent = Agent(model=nvidia_model)
+
+# Test with the same questions
+questions = [
+    "What is the capital of France?",
+    "Explain machine learning in one sentence.",
+    "What's 15 * 23?"
+]
+
+for question in questions:
+    print(f"Q: {question}")
+    response = agent(question)
+    print(f"A: {response}\n")
+```
+
+**Key Differences:**
+- **Bedrock**: Uses `BedrockModel` from `strands.models`
+- **OpenAI**: Uses `OpenAIModel` from `strands.models.openai` 
+- **NVIDIA NIM**: Uses `LiteLLMModel` from `strands.models.litellm`
+- **Configuration**: Each provider has different parameters and setup requirements
+- **Cost**: Bedrock and OpenAI are pay-per-use, NVIDIA NIM has free tier
+
+**Setup Requirements:**
+```bash
+# For OpenAI
+pip install 'strands-agents[openai]'
+export OPENAI_API_KEY="sk-..."
+
+# For NVIDIA NIM (free tier available)
+pip install 'strands-agents[litellm]'
+export NVIDIA_API_KEY="nvapi-..."
+
+# For Bedrock (default, no extra install needed)
+aws configure  # Set up AWS credentials
+```
+
+### Step 7: Add Debug Logging
 
 Create `exercise1-debug.py` to see what's happening under the hood:
 

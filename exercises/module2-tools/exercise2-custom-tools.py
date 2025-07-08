@@ -81,7 +81,7 @@ def main():
     
     # Test the agent with questions that require different tools
     test_requests = [
-        "What time is it right now?",
+        "What time is it right now, in Sydney?",
         "Calculate 15 * 23 + 47",
         "How many letter 'r's are in the word 'strawberry'?",
         "Reverse the text 'Hello World'",

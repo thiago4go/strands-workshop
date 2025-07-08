@@ -17,6 +17,10 @@
         "--rm",
         "mcp/sequentialthinking"
       ]
+    },
+     "strands": {
+      "command": "uvx",
+      "args": ["strands-agents-mcp-server"]
     }
   }
 }

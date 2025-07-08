@@ -35,6 +35,12 @@
     // Set alias for qchat
     "set alias for qchat": "echo 'alias q=\"/usr/local/bin/qchat\"' >> ~/.bashrc && echo 'alias q=\"/usr/local/bin/qchat\"' >> ~/.bash_profile && echo 'alias q=\"/usr/local/bin/qchat\"' >> ~/.zshrc && echo 'alias q=\"/usr/local/bin/qchat\"' >> ~/.profile",
 
+    //Pulls docker imagens for MCP
+    "pull mcp images": "docker pull mcp/duckduckgo && docker pull mcp/sequentialthinking",
+
+    // Install uv (includes uvx)
+    "install uv": "curl -LsSf https://astral.sh/uv/install.sh | sh && echo 'export PATH=\"$HOME/.cargo/bin:$PATH\"' >> ~/.bashrc && echo 'export PATH=\"$HOME/.cargo/bin:$PATH\"' >> ~/.bash_profile && echo 'export PATH=\"$HOME/.cargo/bin:$PATH\"' >> ~/.zshrc",
+
     // Install Strands SDK, MCP CLI, and workshop utilities
     "install strands sdk": "pip install strands-agents strands-agents[openai] strands-agents[litellm] strands-agents-tools strands-agents-builder a2a-sdk strands-nvidia-nim mcp[cli] fastmcp python-dotenv rich",
 

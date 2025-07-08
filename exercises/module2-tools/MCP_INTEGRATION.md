@@ -1,4 +1,4 @@
-# Module 2 Extra: MCP Integration - Connecting to External Services
+# Module 2 Extra: MCP Integration - Real External MCP Servers
 
 ## What is Model Context Protocol (MCP)?
 
@@ -26,308 +26,249 @@ with mcp_client:
 ## Prerequisites
 
 - Completed Module 2 (Custom Tools)
-- Additional packages: `pip install "mcp[cli]"`
+- Node.js installed (for MCP servers)
 - Understanding of client-server architecture
 
-## Step-by-Step Tutorial
+## What the Workshop Exercise Actually Does
 
-### Step 1: Understanding MCP Architecture
+The `optional-module2-mcp-integration.py` file is a **student exercise** that demonstrates real MCP integration with external servers. Here's what it actually provides:
 
-```
-┌─────────────────┐    MCP Protocol    ┌─────────────────┐
-│  Strands Agent  │ ◄─────────────────► │   MCP Server    │
-│   (MCP Client)  │                    │  (External Tool)│
-└─────────────────┘                    └─────────────────┘
-```
+### 🎯 Three Complete Exercises
 
-- **MCP Server**: Exposes tools (calculator, database, API, etc.)
-- **MCP Client**: Connects to servers and uses their tools
-- **Protocol**: Standardized communication (JSON-RPC over various transports)
+#### **Exercise 1: File Operations with MCP Filesystem Server**
+- **MCP Server Used**: `@modelcontextprotocol/server-filesystem`
+- **Installation**: `npm install -g @modelcontextprotocol/server-filesystem`
+- **Capabilities**:
+  - List files in directories
+  - Create new files with content
+  - Read file contents
+  - Search for files by pattern
+  - Write to existing files
 
-### Step 2: Run the Working MCP Demo
+**What it does:**
+1. Lists all `.py` files in current directory
+2. Creates a `student_notes.txt` file with MCP learning notes
+3. Reads back the content of the created file
 
-The workshop includes a complete, working MCP integration example:
+#### **Exercise 2: Memory Operations with MCP Memory Server**
+- **MCP Server Used**: `@modelcontextprotocol/server-memory`
+- **Installation**: `npm install -g @modelcontextprotocol/server-memory`
+- **Capabilities**:
+  - Create entities in knowledge graph
+  - Create relationships between entities
+  - Read entire knowledge graph
+  - Search nodes by content
+  - Persistent memory across sessions
+
+**What it does:**
+1. Stores information about the student's learning progress
+2. Records completion of filesystem exercise
+3. Retrieves stored information about learning progress
+4. Searches memory for MCP-related information
+
+#### **Exercise 3: Custom Workflow Implementation**
+- **Purpose**: Student implements their own MCP workflow
+- **Example Provided**: Learning Progress Tracker
+- **Requirements**:
+  - Use at least one MCP server
+  - Create agent inside context manager
+  - Perform multiple related tasks
+  - Handle errors gracefully
+
+### 🛠️ Setup and Installation
+
+The exercise includes complete setup instructions and verification:
 
 ```bash
-python exercise2-mcp-integration.py
+# 1. Install required MCP servers
+npm install -g @modelcontextprotocol/server-filesystem
+npm install -g @modelcontextprotocol/server-memory
+
+# 2. Verify installation
+python optional-module2-mcp-integration.py --check
+
+# 3. See setup instructions
+python optional-module2-mcp-integration.py --setup
+
+# 4. Run specific exercises
+python optional-module2-mcp-integration.py --exercise 1  # File operations
+python optional-module2-mcp-integration.py --exercise 2  # Memory operations
+python optional-module2-mcp-integration.py --exercise 3  # Custom workflow
 ```
 
-**What You'll See:**
-```
-🌟 Working MCP Integration Demo
-============================================================
-This demo shows:
-• MCP server with calculator and quiz tools
-• Strands agent connecting via stdio transport
-• Real-time tool discovery and execution
-• Stateful quiz interactions
-============================================================
+### 🔧 Key Technical Implementation
 
-🎯 Testing 7 scenarios:
-============================================================
+#### **Critical MCP Pattern - Context Manager Usage**
 
-1. 💬 User: Calculate 15 + 23
-   🤖 Agent: The sum of 15 + 23 is 38.
+The exercise teaches the **most important MCP concept**:
 
-2. 💬 User: What is 7 multiplied by 8?
-   🤖 Agent: The result of 7 multiplied by 8 is 56.
-
-4. 💬 User: Start a Python quiz for me
-   🤖 Agent: Great! I've started a Python quiz for you.
-   
-   Question: What is the output of print(2 ** 3)?
-   Options: 1. 6  2. 8  3. 9  4. 16
-
-5. 💬 User: My answer is 8
-   🤖 Agent: ✅ Correct! The answer is 8. Great job!
-
-🎉 SUCCESS: MCP Integration Fully Working!
-```
-
-### Step 3: Understanding the Implementation
-
-The working example demonstrates several key MCP concepts:
-
-#### MCP Server (Official SDK)
+❌ **WRONG WAY** (causes MCPClientInitializationError):
 ```python
-from mcp.server import FastMCP
-
-# Create MCP server using official SDK
-mcp = FastMCP("Quiz & Calculator Server")
-
-@mcp.tool()
-def add(a: float, b: float) -> float:
-    """Add two numbers together."""
-    return a + b
-
-@mcp.tool()
-def start_quiz(topic: str, user_id: str = "default") -> str:
-    """Start a quiz on a specific topic."""
-    # Implementation handles stateful quiz logic
-    return quiz_response
-
-# Run with stdio transport
-mcp.run(transport="stdio")
+client = MCPClient(...)
+tools = client.list_tools_sync()  # Outside context manager
+agent = Agent(tools=tools)        # Outside context manager
+with client:
+    response = agent("task")       # Agent created outside, used inside
 ```
 
-#### Strands Agent Integration
+✅ **CORRECT WAY** (works properly):
 ```python
-from mcp import stdio_client, StdioServerParameters
-from strands.tools.mcp import MCPClient
+client = MCPClient(...)
+with client:                      # Context manager first
+    tools = client.list_tools_sync()  # Inside context manager
+    agent = Agent(tools=tools)        # Inside context manager
+    response = agent("task")           # Everything inside
+```
 
-# Create MCP client that spawns the server
-mcp_client = MCPClient(lambda: stdio_client(
+#### **MCP Client Configuration**
+
+**Filesystem Server:**
+```python
+client = MCPClient(lambda: stdio_client(
     StdioServerParameters(
-        command="python",
-        args=[__file__, "--server"]  # Run this script as server
+        command="npx",
+        args=["-y", "@modelcontextprotocol/server-filesystem", current_dir]
     )
 ))
-
-# Use within context manager
-with mcp_client:
-    tools = mcp_client.list_tools_sync()  # Discovers 5 tools
-    agent = Agent(tools=tools)
-    response = agent("Calculate 15 + 23")  # Uses MCP tools
 ```
 
-### Step 4: Key Features Demonstrated
+**Memory Server:**
+```python
+client = MCPClient(lambda: stdio_client(
+    StdioServerParameters(
+        command="npx",
+        args=["-y", "@modelcontextprotocol/server-memory"]
+    )
+))
+```
 
-**✅ 5 Working MCP Tools:**
-- `add` - Mathematical addition
-- `multiply` - Mathematical multiplication  
-- `power` - Exponentiation
-- `start_quiz` - Begin interactive quiz
-- `submit_answer` - Submit quiz answers
+### 🎓 Learning Outcomes
 
-**✅ Stateful Interactions:**
-- Quiz system maintains user progress
-- Answers are validated and scored
-- State persists across multiple interactions
+By completing this exercise, students learn:
 
-**✅ Real-time Communication:**
-- Tools are discovered automatically
-- Agent calls tools as needed
-- Results integrated seamlessly
+✅ **Real MCP Integration** - Connect to actual external MCP servers  
+✅ **Context Manager Lifecycle** - Proper MCP client session management  
+✅ **Tool Auto-Discovery** - How agents automatically discover MCP tools  
+✅ **Error Handling** - Graceful handling of MCP connection issues  
+✅ **Stateful Operations** - Memory server maintains state across calls  
+✅ **Production Patterns** - Best practices for MCP integration  
 
-**✅ Production Patterns:**
-- Official MCP Python SDK
-- Proper error handling
-- Logging and debugging
-- Clean separation of concerns
+### 🚀 Actual Exercise Output
 
-## Installation & Setup
+When you run the exercises, you'll see real interactions like:
 
-### Required Dependencies
+```
+📁 Exercise 1: File Operations
+==================================================
+Secure MCP Filesystem Server running on stdio
+Allowed directories: ['/home/user/workshop/exercises/module2-tools']
+
+📝 Task 1: List all .py files in the current directory
+✅ Result: Here are all the Python (.py) files found:
+1. `/path/to/exercise2-custom-tools.py`
+2. `/path/to/module2-exercise-real-mcp-fixed.py`
+
+📝 Task 2: Create a new file called 'student_notes.txt'
+✅ Result: I've created 'student_notes.txt' with comprehensive MCP learning notes...
+
+🧠 Exercise 2: Memory Operations (FIXED)
+==================================================
+Knowledge Graph MCP Server running on stdio
+
+💭 Task 1: Remember that I am a student learning about MCP integration
+✅ Result: I've stored that you're a student learning about MCP integration in Module 2...
+```
+
+### 🔍 Setup Verification
+
+The exercise includes robust setup checking:
+
 ```bash
-# Install official MCP SDK (already in requirements.txt)
-pip install "mcp[cli]"
-
-# Verify installation
-python -c "from mcp.server import FastMCP; print('MCP SDK installed!')"
+$ python optional-module2-mcp-integration.py --check
+🔍 Checking Student Setup...
+✅ Node.js: v23.7.0
+✅ MCP filesystem server available
+✅ MCP memory server available
+✅ Setup complete! Ready for exercises.
 ```
 
-### Environment Setup
-The workshop environment is already configured with all necessary dependencies.
+## Architecture Overview
 
-## Understanding the Code Structure
-
-### Dual-Mode Script Pattern
-The working example uses a clever pattern where the same script can run as either:
-
-1. **Client Mode** (default): Tests the MCP integration
-2. **Server Mode** (`--server` flag): Runs as MCP server
-
-```python
-def main():
-    if len(sys.argv) > 1 and sys.argv[1] == "--server":
-        # Run as MCP server
-        server = WorkingMCPServer()
-        server.run_server()
-    else:
-        # Run as test client
-        success = test_working_mcp_integration()
 ```
-
-### MCP Server Implementation
-```python
-class WorkingMCPServer:
-    def __init__(self):
-        self.mcp = FastMCP("Quiz & Calculator Server")
-        self._setup_tools()
-        self.quiz_state = {}  # Maintains state
-    
-    def _setup_tools(self):
-        @self.mcp.tool()
-        def add(a: float, b: float) -> float:
-            """Add two numbers together."""
-            return a + b
-        
-        @self.mcp.tool()
-        def start_quiz(topic: str, user_id: str = "default") -> str:
-            """Start a quiz on a specific topic."""
-            # Stateful quiz logic here
-            return quiz_response
-```
-
-### Client Integration
-```python
-def test_working_mcp_integration():
-    # Create client that spawns server as subprocess
-    mcp_client = MCPClient(lambda: stdio_client(
-        StdioServerParameters(
-            command="python",
-            args=[__file__, "--server"]
-        )
-    ))
-    
-    with mcp_client:
-        tools = mcp_client.list_tools_sync()
-        agent = Agent(tools=tools)
-        # Test various scenarios...
+┌─────────────────┐    stdio/JSON-RPC    ┌─────────────────┐
+│  Strands Agent  │ ◄─────────────────► │   MCP Server    │
+│   (MCP Client)  │                    │  (Node.js/npm)  │
+└─────────────────┘                    └─────────────────┘
+        │                                       │
+        │                                       │
+    ┌───▼────┐                              ┌───▼────┐
+    │ Claude │                              │ Tools: │
+    │ 3.7    │                              │ • Files│
+    │ Sonnet │                              │ • Memory│
+    └────────┘                              └────────┘
 ```
 
 ## Common Issues & Solutions
 
-### Issue: "MCPAgentTool has no attribute 'name'"
-**Solution:** Use correct attribute name:
+### Issue: "MCP filesystem server not working"
+**Solution:** The exercise includes a fixed setup checker that properly tests MCP servers:
 ```python
-# ❌ Wrong
-print(f"{tool.name}: {tool.description}")
-
-# ✅ Correct  
-print(f"{tool.tool_name}")
+# Fixed server check uses proper arguments
+result = subprocess.run(
+    ["npx", "-y", "@modelcontextprotocol/server-filesystem", "."],
+    capture_output=True, timeout=3
+)
 ```
 
-### Issue: "Client initialization failed"
-**Solution:** The working example handles this automatically by using stdio transport and proper server spawning.
+### Issue: "MCPClientInitializationError"
+**Solution:** The exercise teaches proper context manager usage - all MCP operations must be inside the `with client:` block.
 
-### Issue: "Module not found"
-**Solution:** All dependencies are included in `requirements.txt`:
-```bash
-pip install -r requirements.txt
-```
-
-## Advanced Features
-
-### Stateful Tool Interactions
-The quiz system demonstrates how MCP tools can maintain state:
-
-```python
-def __init__(self):
-    self.quiz_state = {}  # Maintains user state
-
-@self.mcp.tool()
-def start_quiz(topic: str, user_id: str = "default") -> str:
-    # Store quiz state for this user
-    self.quiz_state[user_id] = {
-        "topic": topic,
-        "current_question": question_data,
-        "answered": False
-    }
-    return formatted_question
-
-@self.mcp.tool()
-def submit_answer(answer: str, user_id: str = "default") -> str:
-    # Retrieve and update user state
-    if user_id in self.quiz_state:
-        # Process answer and update state
-        return result
-```
-
-### Resource Endpoints
-MCP also supports resource endpoints (read-only data):
-
-```python
-@self.mcp.resource("help://calculator")
-def calculator_help() -> str:
-    """Get help for calculator functions."""
-    return help_text
-```
+### Issue: "Node.js not found"
+**Solution:** Install Node.js first, then install MCP servers with npm.
 
 ## Production Considerations
 
 ### Security
-- Input validation in all tools
-- Proper error handling
-- Logging for audit trails
+- MCP filesystem server restricts access to specified directories only
+- Input validation in all tool interactions
+- Proper error handling and logging
 
 ### Performance
-- Efficient state management
-- Connection pooling for multiple clients
-- Proper resource cleanup
+- Stdio transport is efficient for local development
+- Memory server maintains persistent state
+- Connection lifecycle managed by context managers
 
 ### Deployment
-- Docker containerization
-- Health check endpoints
-- Monitoring and metrics
+- MCP servers can run as separate processes
+- HTTP transport available for remote servers
+- Docker containerization supported
 
-## Key Takeaways
+## Key Differences from Documentation
 
-✅ **MCP standardizes external integrations** - One protocol for all services  
-✅ **Official SDK is production-ready** - Robust, well-documented, actively maintained  
-✅ **Stdio transport is perfect for development** - Easy testing and debugging  
-✅ **Auto-discovery works seamlessly** - Tools appear natively to agents  
-✅ **Stateful interactions supported** - Complex workflows possible  
-✅ **Working example provided** - Real, tested implementation ready to run  
+**This exercise IS:**
+- ✅ Real integration with external MCP servers
+- ✅ Using official npm-published MCP servers
+- ✅ Teaching proper MCP client lifecycle management
+- ✅ Demonstrating stateful interactions
+- ✅ Production-ready patterns and error handling
 
 ## Next Steps
 
-1. **Modify the working example**: Add your own tools and quiz questions
-2. **Explore HTTP transports**: For production web services
-3. **Build domain-specific servers**: Create MCP servers for your use cases
-4. **Deploy to production**: Use Docker, AWS ECS, or serverless platforms
+1. **Complete the exercises**: Follow the TODOs in the code
+2. **Extend functionality**: Add your own custom workflows
+3. **Explore other MCP servers**: Try database, API, or web servers
+4. **Build production applications**: Use HTTP transport for remote services
 
 ## Resources
 
-- [Official MCP Python SDK](https://github.com/modelcontextprotocol/python-sdk)
+- [Official MCP Servers](https://github.com/modelcontextprotocol/servers)
 - [MCP Protocol Specification](https://modelcontextprotocol.io/)
 - [Strands MCP Integration Guide](https://strandsagents.com/latest/user-guide/concepts/tools/mcp-tools/)
-- [Working Examples Repository](https://github.com/modelcontextprotocol/servers)
 
-**Time to Complete:** 30 minutes  
+**Time to Complete:** 15 minutes  
 **Difficulty:** Intermediate  
-**Status:** ✅ **FULLY WORKING** - Ready for workshop!
+**Status:** ✅ **FULLY WORKING** - Real MCP integration with external servers!
 
 ---
 
-**Try the working demo now:** `python exercise2-mcp-integration.py` 🚀
+**Start the exercises now:** `python optional-module2-mcp-integration.py --setup` 🚀
