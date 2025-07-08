@@ -30,9 +30,9 @@ By the end of this workshop, you will be able to:
   - OpenRouter API key
 
 ### Pre-Workshop Setup
-1. Clone this repository
-2. Set up virtual environment: `python -m venv .venv && source .venv/bin/activate`
-3. Install dependencies: `pip install -r requirements.txt`
+1. Clone or Fork this repository
+2. Start a codespace in GitHub or a devcontainer in your local VSCode
+3. This will create an environment with the necessary packages and tools
 4. Configure AWS credentials: `aws configure`
 5. Enable Claude 3.7 Sonnet in [AWS Bedrock Console](https://us-west-2.console.aws.amazon.com/bedrock/home?region=us-west-2#/modelaccess)
 6. Verify setup: `python setup/verify_setup.py`
@@ -65,7 +65,6 @@ strands-workshop/
 │   ├── verify_setup.py               # Complete setup verification
 │   ├── test_providers.py             # Test provider access
 │   └── troubleshooting.md            # Common issue resolution
-├── lib/                               # Shared utilities and libraries
 └── exercises/                         # Progressive workshop modules
     ├── module1-basics/
     │   ├── README.md                  # Module 1 documentation
