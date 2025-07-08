@@ -105,6 +105,37 @@ def check_bedrock_access():
         print("   Check AWS permissions and region")
         return False
 
+def check_docker():
+    """Check if Docker is available for MCP server integration"""
+    print("\n🐳 Checking Docker availability...")
+    try:
+        result = subprocess.run(['docker', '--version'], 
+                              capture_output=True, text=True, timeout=10)
+        if result.returncode == 0:
+            version = result.stdout.strip()
+            print(f"✅ Docker - OK ({version})")
+            
+            # Check if Docker daemon is running
+            result = subprocess.run(['docker', 'info'], 
+                                  capture_output=True, text=True, timeout=10)
+            if result.returncode == 0:
+                print("✅ Docker daemon - Running")
+                return True
+            else:
+                print("⚠️  Docker installed but daemon not running")
+                print("   Start Docker to enable MCP server integration")
+                return False
+        else:
+            print("❌ Docker command failed")
+            return False
+    except (subprocess.TimeoutExpired, FileNotFoundError):
+        print("❌ Docker not found")
+        print("   Install Docker for MCP server integration (DuckDuckGo, Sequential Thinking)")
+        return False
+    except Exception as e:
+        print(f"❌ Docker check error: {e}")
+        return False
+
 def check_environment_variables():
     """Check optional environment variables"""
     print("\n🌍 Checking environment variables...")
@@ -136,17 +167,36 @@ def check_workshop_structure():
         'exercises/module1-basics',
         'exercises/module2-tools', 
         'exercises/module3-multi-agent',
-        'exercises/module4-production',
-        'exercises/module5-advanced',
-        'exercises/module6-deployment'
+        'exercises/module4-deployment',
+        'exercises/module5-advanced'
+    ]
+    
+    required_files = [
+        'exercises/module1-basics/exercise1-hello-agent.py',
+        'exercises/module1-basics/exercise1-simple-multi-provider.py',
+        'exercises/module2-tools/exercise2-custom-tools.py',
+        'exercises/module3-multi-agent/exercise3-research-team.py',
+        'exercises/module4-deployment/exercise4-lambda-deployment-tutorial.md',
+        'exercises/module5-advanced/main.py'
     ]
     
     all_good = True
+    
+    # Check directories
     for dir_path in required_dirs:
         if Path(dir_path).exists():
             print(f"✅ {dir_path} - OK")
         else:
             print(f"❌ {dir_path} - Missing")
+            all_good = False
+    
+    # Check key exercise files
+    print("\n📄 Checking key exercise files...")
+    for file_path in required_files:
+        if Path(file_path).exists():
+            print(f"✅ {Path(file_path).name} - OK")
+        else:
+            print(f"❌ {Path(file_path).name} - Missing from {Path(file_path).parent}")
             all_good = False
     
     return all_good
@@ -161,6 +211,7 @@ def main():
         check_strands_installation,
         check_aws_credentials,
         check_bedrock_access,
+        check_docker,
         check_environment_variables,
         check_workshop_structure
     ]
@@ -197,7 +248,8 @@ def main():
         print("1. Install missing dependencies: pip install -r requirements.txt")
         print("2. Configure AWS: aws configure")
         print("3. Enable Bedrock models: https://console.aws.amazon.com/bedrock/home#/modelaccess")
-        print("4. Set optional API keys in .env file")
+        print("4. Install and start Docker for MCP integration")
+        print("5. Set optional API keys in .env file")
     
     return passed == total
 
