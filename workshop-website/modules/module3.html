@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 3: Multi-Agent Research Team - AWS Strands AI Agents Workshop</title>
+    <meta name="description" content="Learn to build coordinated multi-agent systems using the agents-as-tools pattern">
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="../styles/main.css">
+</head>
+<body data-module="module3">
+    <header>
+        <nav class="main-nav">
+            <div class="container">
+                <div class="logo">
+                    <a href="../index.html">
+                        <h1>AWS Strands Workshop</h1>
+                    </a>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="../setup.html">Setup Guide</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" aria-haspopup="true" aria-expanded="false">Modules</a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="module1.html" role="menuitem">Module 1: Basics</a></li>
+                            <li><a href="module2.html" role="menuitem">Module 2: Tools</a></li>
+                            <li><a href="module3.html" class="active" role="menuitem" aria-current="page">Module 3: Multi-Agent</a></li>
+                            <li><a href="module4.html" role="menuitem">Module 4: Deployment</a></li>
+                            <li><a href="module5.html" role="menuitem">Module 5: Advanced</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="../troubleshooting.html">Troubleshooting</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="module-header">
+            <div class="container">
+                <div class="module-badge">Module 3</div>
+                <h1>Multi-Agent Research Team</h1>
+                <div class="module-meta">
+                    <span><i class="icon-clock"></i> 35 minutes</span>
+                    <span><i class="icon-level"></i> Advanced</span>
+                    <span>Act II: Multi-Agent Orchestration</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="module-navigation">
+            <div class="container">
+                <nav class="module-nav">
+                    <ul>
+                        <li><a href="#learning-objectives">Learning Objectives</a></li>
+                        <li><a href="#prerequisites">Prerequisites</a></li>
+                        <li><a href="#key-concepts">Key Concepts</a></li>
+                        <li><a href="#architecture">Architecture</a></li>
+                        <li><a href="#step-by-step">Step-by-Step</a></li>
+                        <li><a href="#code-examples">Code Examples</a></li>
+                        <li><a href="#coordination-patterns">Coordination Patterns</a></li>
+                        <li><a href="#common-issues">Common Issues</a></li>
+                        <li><a href="#next-steps">Next Steps</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </section>
+
+        <div class="module-content">
+            <div class="container">
+                <div class="module-progress">
+                    <div class="progress-header">
+                        <h3>Your Progress</h3>
+                        <span class="progress-percentage">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-bar-fill"></div>
+                    </div>
+                </div>
+
+                <section id="learning-objectives" class="content-section">
+                    <h2>Learning Objectives</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="objectives-read" class="progress-checkbox" data-module="module3" data-step="objectives">
+                        <label for="objectives-read">Review learning objectives</label>
+                    </div>
+                    <ul>
+                        <li>Implement the agents-as-tools pattern for multi-agent coordination</li>
+                        <li>Create specialized agents that work as callable tools</li>
+                        <li>Build intelligent task routing and orchestration</li>
+                        <li>Handle production-grade agent-to-agent communication</li>
+                        <li>Integrate MCP tools for real web search and reasoning</li>
+                        <li>Understand true multi-agent collaboration vs sequential workflows</li>
+                    </ul>
+                </section>
+
+                <section id="prerequisites" class="content-section">
+                    <h2>Prerequisites</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="prerequisites-check" class="progress-checkbox" data-module="module3" data-step="prerequisites">
+                        <label for="prerequisites-check">Verify prerequisites are met</label>
+                    </div>
+                    <ul>
+                        <li>Completed Module 2 (Custom Tools & MCP)</li>
+                        <li>Understanding of the <code>@tool</code> decorator</li>
+                        <li>Docker installed (for MCP servers)</li>
+                        <li>Basic understanding of orchestration patterns</li>
+                    </ul>
+                    <div class="code-block">
+                        <pre><code># Verify Docker is available for MCP servers
+docker --version
+
+# Pull required MCP server images
+docker pull mcp/duckduckgo
+docker pull mcp/sequentialthinking</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                </section>
+
+                <section id="key-concepts" class="content-section">
+                    <h2>Key Concepts</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="concepts-review" class="progress-checkbox" data-module="module3" data-step="concepts">
+                        <label for="concepts-review">Review key concepts</label>
+                    </div>
+
+                    <h3>Agents-as-Tools Pattern</h3>
+                    <p>The agents-as-tools pattern enables true multi-agent coordination by wrapping specialist agents as callable tools for an orchestrator agent:</p>
+                    
+                    <div class="comparison-table">
+                        <h4>❌ Sequential Workflow vs ✅ Agents-as-Tools</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Sequential Workflow (Not Real Multi-Agent)</th>
+                                    <th>Agents-as-Tools (Real Multi-Agent)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Agent A runs → Agent B runs → Agent C runs</td>
+                                    <td>Orchestrator agent uses specialist agents as tools</td>
+                                </tr>
+                                <tr>
+                                    <td>Each agent ignores previous outputs</td>
+                                    <td>Each specialist's output becomes input to next</td>
+                                </tr>
+                                <tr>
+                                    <td>No intelligent coordination</td>
+                                    <td>Orchestrator intelligently routes to specialists</td>
+                                </tr>
+                                <tr>
+                                    <td>Just workflow steps</td>
+                                    <td>Real agent-to-agent communication</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Task Complexity Levels</h3>
+                    <div class="code-block">
+                        <pre><code>class TaskComplexity(Enum):
+    """Real complexity levels based on research requirements."""
+    SIMPLE = "simple"      # Single source verification, 1-2 agents
+    STANDARD = "standard"  # Multi-source research, 2-3 agents  
+    COMPLEX = "complex"    # Cross-verification, all agents
+    EXPERT = "expert"      # Deep analysis with fact-checking, all agents + validation</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+
+                    <h3>Specialist Agent Types</h3>
+                    <ul>
+                        <li><strong>ResearchSpecialist</strong>: Web research with DuckDuckGo MCP tools</li>
+                        <li><strong>AnalysisSpecialist</strong>: Structured analysis with Sequential Thinking tools</li>
+                        <li><strong>FactCheckSpecialist</strong>: Verification using DuckDuckGo search</li>
+                        <li><strong>QualityAssuranceSpecialist</strong>: Assessment with combined tool sets</li>
+                    </ul>
+                </section>
+
+                <section id="architecture" class="content-section">
+                    <h2>Architecture Overview</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="architecture-review" class="progress-checkbox" data-module="module3" data-step="architecture">
+                        <label for="architecture-review">Review architecture diagram</label>
+                    </div>
+                    
+                    <div class="architecture-diagram">
+                        <h3>Multi-Agent Research Team Architecture</h3>
+                        <div class="diagram-container">
+                            <pre class="mermaid-diagram">
+graph TB
+    User[👤 User Research Request] --> ResearchTeam[🎯 ResearchTeam Class<br/>Agents-as-Tools Coordinator]
+    ResearchTeam --> MCPSetup[🌐 MCP Client Setup<br/>DuckDuckGo + Sequential Thinking]
+    
+    MCPSetup --> ContextManager[🔄 Context Manager<br/>ExitStack with MCP Clients]
+    ContextManager --> Orchestrator[🤖 Orchestrator Agent<br/>ResearchOrchestrator]
+    
+    Orchestrator --> SpecialistTools[🛠️ Specialist Agent Tools<br/>@tool wrapped agents]
+    
+    SpecialistTools --> ResearchTool[🔍 @tool research_specialist<br/>Web Research via DuckDuckGo]
+    SpecialistTools --> AnalysisTool[📊 @tool analysis_specialist<br/>Sequential Thinking Analysis]
+    SpecialistTools --> FactCheckTool[✅ @tool factcheck_specialist<br/>Fact Verification via DuckDuckGo]
+    SpecialistTools --> QualityTool[🏆 @tool quality_specialist<br/>Quality Assessment]
+    
+    ResearchTool --> ResearchAgent[🔬 Research Agent<br/>ResearchSpecialist]
+    AnalysisTool --> AnalysisAgent[📈 Analysis Agent<br/>AnalysisSpecialist]
+    FactCheckTool --> FactCheckAgent[🔍 Fact-Check Agent<br/>FactCheckSpecialist]
+    QualityTool --> QualityAgent[⭐ Quality Agent<br/>QualityAssuranceSpecialist]
+    
+    ResearchAgent --> DuckDuckGoTools[🌐 DuckDuckGo MCP Tools<br/>Web Search Capabilities]
+    AnalysisAgent --> SequentialTools[🧠 Sequential Thinking Tools<br/>Structured Reasoning]
+    FactCheckAgent --> DuckDuckGoTools
+    QualityAgent --> CombinedTools[🔧 Combined Tools<br/>Sequential + DuckDuckGo]
+    
+    DuckDuckGoTools --> MCPDuckDuckGo[🐳 MCP DuckDuckGo Server<br/>Docker Container]
+    SequentialTools --> MCPSequential[🐳 MCP Sequential Server<br/>Docker Container]
+    CombinedTools --> MCPDuckDuckGo
+    CombinedTools --> MCPSequential
+    
+    MCPDuckDuckGo --> WebSearchResults[🔍 Real Web Search Results]
+    MCPSequential --> StructuredAnalysis[🧠 Structured Reasoning Output]
+    
+    WebSearchResults --> ResearchResult[📋 ResearchResult<br/>Comprehensive Report]
+    StructuredAnalysis --> ResearchResult
+    ResearchResult --> PerformanceMetrics[📊 Performance Metrics<br/>Quality Scores & Execution Time]
+            </pre>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="step-by-step" class="content-section">
+                    <h2>Step-by-Step Instructions</h2>
+
+                    <div class="step-item">
+                        <div class="step-checkbox">
+                            <input type="checkbox" id="step-3-1" class="progress-checkbox" data-module="module3" data-step="1">
+                            <label for="step-3-1"><strong>Step 1: Setup MCP Clients</strong></label>
+                        </div>
+                        <div class="step-content">
+                            <p>Initialize MCP clients for external services:</p>
+                            <div class="code-block">
+                                <pre><code>def setup_mcp_clients():
+    """Setup MCP clients for DuckDuckGo search and Sequential Thinking tools."""
+    try:
+        # DuckDuckGo MCP Client
+        duckduckgo_client = MCPClient(lambda: stdio_client(
+            StdioServerParameters(
+                command="docker",
+                args=["run", "-i", "--rm", "mcp/duckduckgo"]
+            )
+        ))
+        
+        # Sequential Thinking MCP Client  
+        sequential_thinking_client = MCPClient(lambda: stdio_client(
+            StdioServerParameters(
+                command="docker",
+                args=["run", "-i", "--rm", "mcp/sequentialthinking"]
+            )
+        ))
+        
+        return duckduckgo_client, sequential_thinking_client
+        
+    except Exception as e:
+        logger.error(f"Failed to setup MCP clients: {e}")
+        return None, None</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <div class="step-checkbox">
+                            <input type="checkbox" id="step-3-2" class="progress-checkbox" data-module="module3" data-step="2">
+                            <label for="step-3-2"><strong>Step 2: Create Specialized Agents</strong></label>
+                        </div>
+                        <div class="step-content">
+                            <p>Build specialist agents with specific capabilities:</p>
+                            <div class="code-block">
+                                <pre><code>def create_specialized_agents():
+    """Create specialized agents that will be wrapped as tools."""
+    model = BedrockModel(
+        model_id="us.anthropic.claude-3-7-sonnet-20250219-v1:0",
+        temperature=0.3
+    )
+    
+    # Research Agent with DuckDuckGo search
+    research_agent = Agent(
+        name="ResearchSpecialist",
+        model=model,
+        system_prompt="""You are a specialized Research Agent who performs ACTUAL web research.
+
+Your expertise:
+1. Search the web using DuckDuckGo search tools for real information
+2. Extract factual information from search results
+3. Provide comprehensive research findings with source attribution
+4. Handle search errors gracefully with fallback responses
+
+Use the DuckDuckGo search tools to find current, accurate information on any topic.
+Always provide source attribution and verify information quality.""",
+        tools=duckduckgo_tools
+    )
+    
+    # Analysis Agent with Sequential Thinking
+    analysis_agent = Agent(
+        name="AnalysisSpecialist", 
+        model=model,
+        system_prompt="""You are a specialized Analysis Agent who processes research data.
+
+Your expertise:
+1. Analyze research findings and identify key patterns using sequential thinking
+2. Extract insights and synthesize information systematically
+3. Use structured reasoning to break down complex problems
+4. Generate comprehensive analytical reports
+
+Use sequential thinking tools to work through complex analysis step by step.""",
+        tools=sequential_thinking_tools
+    )
+    
+    return research_agent, analysis_agent, factcheck_agent, qa_agent</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <div class="step-checkbox">
+                            <input type="checkbox" id="step-3-3" class="progress-checkbox" data-module="module3" data-step="3">
+                            <label for="step-3-3"><strong>Step 3: Implement Agents-as-Tools Pattern</strong></label>
+                        </div>
+                        <div class="step-content">
+                            <p>Wrap specialist agents as callable tools:</p>
+                            <div class="code-block">
+                                <pre><code># Create @tool wrapped functions for each specialist agent
+@tool
+def research_specialist(topic: str) -> str:
+    """
+    Perform comprehensive web research using DuckDuckGo search.
+    
+    Args:
+        topic (str): The research topic to investigate
+        
+    Returns:
+        str: Comprehensive research findings with source attribution
+    """
+    try:
+        logger.info(f"🔍 Research Specialist: Investigating '{topic}'")
+        result = research_agent(
+            f"Research the topic: '{topic}'. "
+            f"Use DuckDuckGo search to find current, accurate information. "
+            f"Provide detailed findings with proper source attribution."
+        )
+        return str(result)
+    except Exception as e:
+        logger.error(f"Research specialist error: {e}")
+        return f"Research error: {str(e)}"
+
+@tool
+def analysis_specialist(research_data: str) -> str:
+    """
+    Analyze research data using sequential thinking approach.
+    
+    Args:
+        research_data (str): Research findings to analyze
+        
+    Returns:
+        str: Detailed analysis with insights and patterns
+    """
+    try:
+        logger.info("📊 Analysis Specialist: Processing research data")
+        result = analysis_agent(
+            f"Analyze this research data using sequential thinking: {research_data}. "
+            f"Break down the analysis step by step and extract key insights."
+        )
+        return str(result)
+    except Exception as e:
+        logger.error(f"Analysis specialist error: {e}")
+        return f"Analysis error: {str(e)}"</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <div class="step-checkbox">
+                            <input type="checkbox" id="step-3-4" class="progress-checkbox" data-module="module3" data-step="4">
+                            <label for="step-3-4"><strong>Step 4: Create Orchestrator Agent</strong></label>
+                        </div>
+                        <div class="step-content">
+                            <p>Build the orchestrator that coordinates specialist agents:</p>
+                            <div class="code-block">
+                                <pre><code># Orchestrator Agent with Specialist Agents as Tools
+orchestrator = Agent(
+    name="ResearchOrchestrator",
+    model=self.model,
+    system_prompt="""You are a Research Orchestrator managing a team of specialist agents.
+
+You have access to these specialist agent tools:
+- research_specialist: Performs web research using DuckDuckGo search
+- analysis_specialist: Analyzes research data using sequential thinking  
+- factcheck_specialist: Fact-checks claims using DuckDuckGo search
+- quality_specialist: Assesses research quality and completeness
+
+Your coordination strategy:
+1. For any research request, use research_specialist to gather information via web search
+2. Use analysis_specialist to process and synthesize the research data systematically
+3. For complex topics, use factcheck_specialist to verify key claims via web search
+4. Use quality_specialist to ensure research meets high standards
+5. Coordinate intelligently based on the complexity and requirements
+
+This is REAL multi-agent coordination - you are calling actual specialist agents
+that will perform real work (web search, systematic analysis, fact-checking).
+Route queries appropriately and build comprehensive responses.""",
+    tools=[research_specialist, analysis_specialist, factcheck_specialist, quality_specialist]
+)</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <div class="step-checkbox">
+                            <input type="checkbox" id="step-3-5" class="progress-checkbox" data-module="module3" data-step="5">
+                            <label for="step-3-5"><strong>Step 5: Implement Context Management</strong></label>
+                        </div>
+                        <div class="step-content">
+                            <p>Handle MCP client lifecycle with proper context management:</p>
+                            <div class="code-block">
+                                <pre><code>def conduct_real_research(self, topic: str, complexity: TaskComplexity = TaskComplexity.STANDARD):
+    """
+    Conduct REAL research using agents-as-tools pattern with MCP integration.
+    """
+    # Use all available MCP clients in context
+    if self.mcp_clients:
+        from contextlib import ExitStack
+        
+        with ExitStack() as stack:
+            # Enter all MCP client contexts
+            for client in self.mcp_clients:
+                if client:
+                    stack.enter_context(client)
+            
+            print("✅ MCP connections established")
+            
+            # Create orchestrator with MCP-enabled specialist agents
+            orchestrator = self._create_orchestrator_with_mcp()
+            
+            print("🎯 ORCHESTRATOR: Coordinating specialist agents with MCP tools...")
+            
+            # Create research instruction based on complexity
+            research_instruction = self._create_research_instruction(topic, complexity)
+            
+            # ORCHESTRATOR COORDINATES REAL AGENTS WITH MCP
+            result_summary = orchestrator(research_instruction)
+            
+    return result_summary</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <div class="step-checkbox">
+                            <input type="checkbox" id="step-3-6" class="progress-checkbox" data-module="module3" data-step="6">
+                            <label for="step-3-6"><strong>Step 6: Run the Multi-Agent System</strong></label>
+                        </div>
+                        <div class="step-content">
+                            <p>Execute the complete multi-agent research system:</p>
+                            <div class="code-block">
+                                <pre><code>python exercise3-research-team.py</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                            <p><strong>Expected Output:</strong></p>
+                            <div class="code-block">
+                                <pre><code>🎯 REAL MULTI-AGENT RESEARCH: artificial intelligence trends
+📊 Complexity Level: STANDARD
+🔧 Pattern: Agents-as-Tools with MCP Integration
+--------------------------------------------------------------------------------
+🌐 Initializing MCP connections...
+✅ MCP connections established
+🎯 ORCHESTRATOR: Coordinating specialist agents with MCP tools...
+
+🏆 REAL MULTI-AGENT RESEARCH COMPLETED
+   Execution Time: 15.23s
+   Quality Score: 8.7/10.0
+   Orchestrator + 3 Specialist Agents
+   Coordination Pattern: Agents-as-Tools with MCP
+   MCP Clients: 2
+   Specialist Agents Used: research_specialist, analysis_specialist, factcheck_specialist</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="code-examples" class="content-section">
+                    <h2>Advanced Code Examples</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="code-examples-review" class="progress-checkbox" data-module="module3" data-step="examples">
+                        <label for="code-examples-review">Review advanced examples</label>
+                    </div>
+
+                    <h3>Research Result Data Structure</h3>
+                    <div class="code-block">
+                        <pre><code>@dataclass
+class ResearchResult:
+    """Comprehensive result from real multi-agent research."""
+    topic: str
+    complexity: TaskComplexity
+    research_summary: str
+    sources_found: List[str]
+    web_requests_made: int
+    execution_time: float
+    agents_utilized: List[str]
+    quality_score: float
+    metadata: Dict[str, Any] = field(default_factory=dict)</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+
+                    <h3>Complexity-Based Coordination Strategy</h3>
+                    <div class="code-block">
+                        <pre><code>def _create_research_instruction(self, topic: str, complexity: TaskComplexity) -> str:
+    """Create research instruction for the orchestrator."""
+    return f"""
+    Conduct comprehensive research on: '{topic}' with {complexity.value} complexity.
+    
+    Coordination strategy based on complexity:
+    - SIMPLE: Use research_specialist only
+    - STANDARD: Use research_specialist + analysis_specialist
+    - COMPLEX: Use research_specialist + analysis_specialist + factcheck_specialist  
+    - EXPERT: Use all specialist agents for comprehensive research
+    
+    The specialist agents will perform actual work with MCP tools:
+    - Real web searches using DuckDuckGo MCP integration
+    - Systematic analysis using sequential thinking MCP tools
+    - Genuine fact-checking against multiple web sources
+    - Real quality assessment with comprehensive metrics
+    
+    Coordinate intelligently and build comprehensive findings from the specialist agents' work.
+    Each agent's output becomes input for the next agent in your coordination strategy.
+    """</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+
+                    <h3>Performance Metrics Collection</h3>
+                    <div class="code-block">
+                        <pre><code>def get_real_performance_metrics(self) -> Dict[str, Any]:
+    """Generate REAL performance metrics from agents-as-tools operations."""
+    success_rate = (self.execution_metrics['successful_requests'] / 
+                   max(1, self.execution_metrics['total_requests'])) * 100
+    
+    avg_execution_time = (self.execution_metrics['total_execution_time'] / 
+                         max(1, self.execution_metrics['successful_requests']))
+    
+    avg_quality_score = (sum(self.execution_metrics['quality_scores']) / 
+                        max(1, len(self.execution_metrics['quality_scores'])))
+    
+    return {
+        'total_requests': self.execution_metrics['total_requests'],
+        'success_rate': success_rate,
+        'avg_execution_time': avg_execution_time,
+        'avg_quality_score': avg_quality_score,
+        'agent_coordination_calls': self.execution_metrics['agent_calls'],
+        'coordination_pattern': 'agents-as-tools-with-mcp',
+        'mcp_integration': True,
+        'mcp_clients_available': len(self.mcp_clients),
+        'research_type': 'AGENTS_AS_TOOLS_WITH_MCP_INTEGRATION',
+        'capabilities': [
+            'Real multi-agent coordination using @tool pattern',
+            'Specialist agents as callable tools',
+            'Intelligent agent routing by orchestrator',
+            'MCP integration for web search (DuckDuckGo)',
+            'Sequential thinking tools for systematic analysis',
+            'True agent-to-agent communication and data flow'
+        ]
+    }</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                </section>
+
+                <section id="coordination-patterns" class="content-section">
+                    <h2>Coordination Patterns</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="coordination-review" class="progress-checkbox" data-module="module3" data-step="coordination">
+                        <label for="coordination-review">Review coordination patterns</label>
+                    </div>
+
+                    <h3>Agent Communication Flow</h3>
+                    <div class="sequence-diagram">
+                        <h4>Agents-as-Tools Communication Sequence</h4>
+                        <div class="code-block">
+                            <pre><code>User Request → Orchestrator Agent
+    ↓
+Orchestrator calls research_specialist(topic)
+    ↓
+Research Agent executes with DuckDuckGo tools
+    ↓
+Research findings returned to Orchestrator
+    ↓
+Orchestrator calls analysis_specialist(research_data)
+    ↓
+Analysis Agent executes with Sequential Thinking tools
+    ↓
+Analysis insights returned to Orchestrator
+    ↓
+Orchestrator calls factcheck_specialist(claims)
+    ↓
+FactCheck Agent executes with DuckDuckGo tools
+    ↓
+Verification results returned to Orchestrator
+    ↓
+Orchestrator synthesizes comprehensive response</code></pre>
+                            <button class="copy-btn">Copy</button>
+                        </div>
+                    </div>
+
+                    <h3>Task Complexity Routing</h3>
+                    <div class="code-block">
+                        <pre><code># SIMPLE complexity - minimal agents
+if complexity == TaskComplexity.SIMPLE:
+    agents_to_use = ["research_specialist"]
+
+# STANDARD complexity - core research + analysis
+elif complexity == TaskComplexity.STANDARD:
+    agents_to_use = ["research_specialist", "analysis_specialist"]
+
+# COMPLEX complexity - add fact-checking
+elif complexity == TaskComplexity.COMPLEX:
+    agents_to_use = ["research_specialist", "analysis_specialist", "factcheck_specialist"]
+
+# EXPERT complexity - all agents + quality assurance
+elif complexity == TaskComplexity.EXPERT:
+    agents_to_use = ["research_specialist", "analysis_specialist", 
+                    "factcheck_specialist", "quality_specialist"]</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+
+                    <h3>Error Handling and Resilience</h3>
+                    <div class="code-block">
+                        <pre><code>@tool
+def resilient_specialist(task_data: str) -> str:
+    """Specialist agent with comprehensive error handling."""
+    try:
+        # Attempt primary execution
+        result = specialist_agent(task_data)
+        return str(result)
+        
+    except MCPConnectionError as e:
+        logger.warning(f"MCP connection issue: {e}")
+        # Fallback to basic processing without MCP tools
+        return fallback_processing(task_data)
+        
+    except Exception as e:
+        logger.error(f"Specialist agent error: {e}")
+        return f"Specialist processing error: {str(e)}"</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                </section>
+
+                <section id="common-issues" class="content-section">
+                    <h2>Common Issues & Solutions</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="common-issues-review" class="progress-checkbox" data-module="module3" data-step="issues">
+                        <label for="common-issues-review">Review common issues</label>
+                    </div>
+
+                    <h3>Issue: Docker MCP Servers Not Starting</h3>
+                    <div class="code-block">
+                        <pre><code>Error: Failed to setup MCP clients</code></pre>
+                    </div>
+                    <p><strong>Solution:</strong> Verify Docker installation and pull images:
+                    <div class="code-block">
+                        <pre><code># Check Docker is running
+docker --version
+docker info
+
+# Pull required MCP server images
+docker pull mcp/duckduckgo
+docker pull mcp/sequentialthinking
+
+# Test MCP servers manually
+docker run -i --rm mcp/duckduckgo</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+
+                    <h3>Issue: Agents Not Coordinating Properly</h3>
+                    <div class="code-block">
+                        <pre><code>Orchestrator not calling specialist agents as expected</code></pre>
+                    </div>
+                    <p><strong>Solution:</strong> Improve tool descriptions and orchestrator prompt:</p>
+                    <div class="code-block">
+                        <pre><code>@tool
+def research_specialist(topic: str) -> str:
+    """
+    CRITICAL: Use this tool to perform web research on any topic.
+    This tool performs ACTUAL web searches using DuckDuckGo.
+    
+    When to use: ANY time you need current information about a topic.
+    
+    Args:
+        topic (str): The research topic to investigate
+        
+    Returns:
+        str: Comprehensive research findings with source attribution
+    """</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+
+                    <h3>Issue: MCP Context Manager Errors</h3>
+                    <div class="code-block">
+                        <pre><code>RuntimeError: MCP client not in context</code></pre>
+                    </div>
+                    <p><strong>Solution:</strong> Ensure all agent creation happens within MCP context:</p>
+                    <div class="code-block">
+                        <pre><code># ✅ CORRECT: Everything inside context manager
+with ExitStack() as stack:
+    for client in self.mcp_clients:
+        if client:
+            stack.enter_context(client)
+    
+    # Create agents and orchestrator inside context
+    orchestrator = self._create_orchestrator_with_mcp()
+    result = orchestrator(research_instruction)</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+
+                    <h3>Issue: Performance and Timeout Issues</h3>
+                    <div class="code-block">
+                        <pre><code>TimeoutError: Agent coordination taking too long</code></pre>
+                    </div>
+                    <p><strong>Solution:</strong> Implement timeout handling and parallel processing:</p>
+                    <div class="code-block">
+                        <pre><code>import asyncio
+from concurrent.futures import ThreadPoolExecutor, TimeoutError
+
+def execute_with_timeout(agent_func, *args, timeout=30):
+    """Execute agent function with timeout."""
+    with ThreadPoolExecutor() as executor:
+        future = executor.submit(agent_func, *args)
+        try:
+            return future.result(timeout=timeout)
+        except TimeoutError:
+            return f"Agent execution timed out after {timeout}s"</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                </section>
+
+                <section id="next-steps" class="content-section">
+                    <h2>Next Steps</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="next-steps-review" class="progress-checkbox" data-module="module3" data-step="next">
+                        <label for="next-steps-review">Review next steps</label>
+                    </div>
+                    <p>In Module 4, you'll learn to:</p>
+                    <ul>
+                        <li>Deploy Strands agents to AWS Lambda</li>
+                        <li>Package agents with dependencies</li>
+                        <li>Configure IAM roles and permissions</li>
+                        <li>Handle serverless deployment patterns</li>
+                        <li>Integrate with API Gateway for web access</li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+
+        <section class="key-takeaways">
+            <div class="container">
+                <h2>Key Takeaways</h2>
+                <ul>
+                    <li>✅ <strong>Agents-as-tools enables true multi-agent coordination</strong> - Real collaboration vs workflows</li>
+                    <li>✅ <strong>Orchestrator intelligently routes tasks</strong> - Dynamic specialist selection</li>
+                    <li>✅ <strong>MCP integration provides real capabilities</strong> - Web search and reasoning tools</li>
+                    <li>✅ <strong>Context management is critical</strong> - All agents must be created within MCP contexts</li>
+                    <li>✅ <strong>Complexity-based coordination scales</strong> - From simple to expert research levels</li>
+                </ul>
+                <div class="module-metadata">
+                    <p><strong>Time to Complete:</strong> 35 minutes</p>
+                    <p><strong>Difficulty:</strong> Advanced</p>
+                    <p><strong>Prerequisites Met:</strong> ✅ Ready for Module 4</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="next-module">
+            <div class="container">
+                <h2>Continue Your Journey</h2>
+                <p>Outstanding work! You've mastered multi-agent coordination with the agents-as-tools pattern. Ready to deploy to production?</p>
+                <div class="module-nav-buttons">
+                    <a href="module2.html" class="btn btn-secondary">← Previous: Module 2</a>
+                    <a href="module4.html" class="btn btn-primary">Continue to Module 4: Deployment →</a>
+                </div>
+                <a href="../troubleshooting.html" class="btn btn-secondary">Need Help?</a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h2>AWS Strands Workshop</h2>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="../index.html">Home</a></li>
+                        <li><a href="../setup.html">Setup Guide</a></li>
+                        <li><a href="module3.html">Module 3: Multi-Agent</a></li>
+                        <li><a href="../troubleshooting.html">Troubleshooting</a></li>
+                    </ul>
+                </div>
+                <div class="footer-resources">
+                    <h3>Additional Resources</h3>
+                    <ul>
+                        <li><a href="https://strandsagents.com/" target="_blank" rel="noopener noreferrer">AWS Strands SDK Documentation</a></li>
+                        <li><a href="https://docs.aws.amazon.com/bedrock/" target="_blank" rel="noopener noreferrer">Amazon Bedrock User Guide</a></li>
+                        <li><a href="https://modelcontextprotocol.io/" target="_blank" rel="noopener noreferrer">Model Context Protocol (MCP) Documentation</a></li>
+                        <li><a href="https://github.com/a2aproject/A2A" target="_blank" rel="noopener noreferrer">A2A Protocol Documentation</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 AWS Strands Workshop. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Prism.js for syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+    
+    <!-- Diagram Renderer for Interactive Visualizations -->
+    <script src="../scripts/diagram-renderer.js"></script>
+    
+    <!-- Main JavaScript functionality -->
+    <script src="../scripts/main.js"></script>
+</body>
+</html>

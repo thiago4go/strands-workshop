@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 4: Lambda Deployment - AWS Strands AI Agents Workshop</title>
+    <meta name="description" content="Learn to deploy Strands agents to AWS Lambda for serverless production">
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="../styles/main.css">
+</head>
+<body data-module="module4">
+    <header>
+        <nav class="main-nav">
+            <div class="container">
+                <div class="logo">
+                    <a href="../index.html">
+                        <h1>AWS Strands Workshop</h1>
+                    </a>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="../setup.html">Setup Guide</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" aria-haspopup="true" aria-expanded="false">Modules</a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="module1.html" role="menuitem">Module 1: Basics</a></li>
+                            <li><a href="module2.html" role="menuitem">Module 2: Tools</a></li>
+                            <li><a href="module3.html" role="menuitem">Module 3: Multi-Agent</a></li>
+                            <li><a href="module4.html" class="active" role="menuitem" aria-current="page">Module 4: Deployment</a></li>
+                            <li><a href="module5.html" role="menuitem">Module 5: Advanced</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="../troubleshooting.html">Troubleshooting</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="module-header">
+            <div class="container">
+                <div class="module-badge">Module 4</div>
+                <h1>Lambda Deployment</h1>
+                <div class="module-meta">
+                    <span><i class="icon-clock"></i> 30 minutes</span>
+                    <span><i class="icon-level"></i> Intermediate</span>
+                    <span>Act III: Production Deployment</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="module-navigation">
+            <div class="container">
+                <nav class="module-nav">
+                    <ul>
+                        <li><a href="#learning-objectives">Learning Objectives</a></li>
+                        <li><a href="#prerequisites">Prerequisites</a></li>
+                        <li><a href="#why-lambda">Why Lambda?</a></li>
+                        <li><a href="#architecture">Architecture</a></li>
+                        <li><a href="#step-by-step">Step-by-Step</a></li>
+                        <li><a href="#deployment-examples">Deployment Examples</a></li>
+                        <li><a href="#testing">Testing</a></li>
+                        <li><a href="#common-issues">Common Issues</a></li>
+                        <li><a href="#cleanup">Cleanup</a></li>
+                        <li><a href="#next-steps">Next Steps</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </section>
+
+        <div class="module-content">
+            <div class="container">
+                <div class="module-progress">
+                    <div class="progress-header">
+                        <h3>Your Progress</h3>
+                        <span class="progress-percentage">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-bar-fill"></div>
+                    </div>
+                </div>
+
+                <section id="learning-objectives" class="content-section">
+                    <h2>Learning Objectives</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="objectives-read" class="progress-checkbox" data-module="module4" data-step="objectives">
+                        <label for="objectives-read">Review learning objectives</label>
+                    </div>
+                    <p>By the end of this module, you will understand:</p>
+                    <ul>
+                        <li><strong>Serverless Deployment Concepts</strong> - Why and when to use AWS Lambda for AI agents</li>
+                        <li><strong>Lambda Architecture Patterns</strong> - How agents work in serverless environments</li>
+                        <li><strong>Security & Permissions</strong> - IAM roles and Bedrock access patterns</li>
+                        <li><strong>Production Considerations</strong> - Performance, monitoring, and cost optimization</li>
+                        <li><strong>Deployment Workflow</strong> - Step-by-step process from development to production</li>
+                        <li><strong>Testing & Troubleshooting</strong> - How to validate and debug deployed agents</li>
+                    </ul>
+                    
+                    <div class="concept-highlight">
+                        <h3>🎯 Core Concept</h3>
+                        <p>This module teaches you to transform your local Strands agents into production-ready, scalable serverless functions that can handle real-world workloads.</p>
+                    </div>
+                </section>
+
+                <section id="prerequisites" class="content-section">
+                    <h2>Prerequisites</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="prerequisites-check" class="progress-checkbox" data-module="module4" data-step="prerequisites">
+                        <label for="prerequisites-check">Verify prerequisites are met</label>
+                    </div>
+                    
+                    <h3>Knowledge Prerequisites</h3>
+                    <ul>
+                        <li><strong>Completed Modules 1-2</strong> - Understanding of basic agents and custom tools</li>
+                        <li><strong>AWS Fundamentals</strong> - Basic familiarity with AWS services</li>
+                        <li><strong>Command Line Basics</strong> - Comfortable with terminal/command prompt</li>
+                    </ul>
+                    
+                    <h3>Technical Prerequisites</h3>
+                    <ul>
+                        <li><strong>AWS Account</strong> - With appropriate permissions for Lambda and IAM</li>
+                        <li><strong>AWS CLI Configured</strong> - With your credentials and default region</li>
+                        <li><strong>Bedrock Access</strong> - Claude 3.7 Sonnet model enabled</li>
+                        <li><strong>Python 3.10+</strong> - For local development and testing</li>
+                    </ul>
+                    
+                    <div class="verification-box">
+                        <h4>Quick Verification</h4>
+                        <p>Run these commands to verify your setup:</p>
+                        <div class="code-block">
+                            <pre><code># Check AWS CLI configuration
+aws sts get-caller-identity
+
+# Check Python version  
+python3 --version</code></pre>
+                            <button class="copy-btn">Copy</button>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="why-lambda" class="content-section">
+                    <h2>Why AWS Lambda for Strands Agents?</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="why-lambda-review" class="progress-checkbox" data-module="module4" data-step="why-lambda">
+                        <label for="why-lambda-review">Review Lambda benefits</label>
+                    </div>
+
+                    <div class="benefits-grid">
+                        <div class="benefit-card">
+                            <h3>🚀 Scalability</h3>
+                            <p>Lambda automatically scales your agent to handle varying loads without manual intervention.</p>
+                        </div>
+                        <div class="benefit-card">
+                            <h3>💰 Cost-Effectiveness</h3>
+                            <p>You only pay for the compute time your agent consumes - no idle server costs.</p>
+                        </div>
+                        <div class="benefit-card">
+                            <h3>🔧 Easy Integration</h3>
+                            <p>Lambda integrates seamlessly with API Gateway, EventBridge, and other AWS services.</p>
+                        </div>
+                        <div class="benefit-card">
+                            <h3>🛡️ Built-in Security</h3>
+                            <p>IAM roles provide fine-grained access control to AWS services like Bedrock.</p>
+                        </div>
+                    </div>
+
+                    <h3>Lambda Considerations for Strands Agents</h3>
+                    <ul>
+                        <li><strong>✅ Perfect for:</strong> Simple agents, custom tool agents, API endpoints</li>
+                        <li><strong>⚠️ Consider alternatives for:</strong> Long-running MCP servers, persistent multi-agent systems</li>
+                        <li><strong>💡 Best practices:</strong> Warm starts, dependency optimization, timeout management</li>
+                    </ul>
+                </section>
+
+                <section id="architecture" class="content-section">
+                    <h2>Deployment Architecture</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="architecture-review" class="progress-checkbox" data-module="module4" data-step="architecture">
+                        <label for="architecture-review">Review deployment architecture</label>
+                    </div>
+                    
+                    <div class="architecture-diagram">
+                        <h3>Lambda Deployment Architecture</h3>
+                        <div class="diagram-container">
+                            <pre class="mermaid-diagram">
+graph TB
+    User[👤 User Request] --> APIGateway[🌐 API Gateway<br/>Optional HTTP Endpoint]
+    User --> DirectInvoke[⚡ Direct Lambda Invoke<br/>AWS CLI/SDK]
+    
+    APIGateway --> LambdaFunction[⚡ Lambda Function<br/>Strands Agent Handler]
+    DirectInvoke --> LambdaFunction
+    
+    LambdaFunction --> IAMRole[🔐 IAM Role<br/>StrandsAgentLambdaRole]
+    LambdaFunction --> DeploymentPackage[📦 Deployment Package<br/>agent + dependencies]
+    
+    DeploymentPackage --> StrandsSDK[📚 Strands SDK<br/>strands-agents]
+    DeploymentPackage --> Dependencies[📦 Dependencies<br/>boto3, etc.]
+    DeploymentPackage --> HandlerCode[💻 Handler Code<br/>lambda_handler.py]
+    
+    IAMRole --> BedrockPermissions[🔑 Bedrock Permissions<br/>bedrock:InvokeModel]
+    IAMRole --> CloudWatchPermissions[📊 CloudWatch Permissions<br/>logs:CreateLogGroup]
+    
+    LambdaFunction --> BedrockModel[🧠 Bedrock Model<br/>Claude 3.7 Sonnet]
+    BedrockModel --> AWSBedrock[☁️ AWS Bedrock<br/>us-east-1/us-west-2]
+    
+    AWSBedrock --> Response[📄 Agent Response]
+    Response --> User
+    
+    LambdaFunction --> CloudWatchLogs[📊 CloudWatch Logs<br/>Monitoring & Debugging]
+            </pre>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="step-by-step" class="content-section">
+                    <h2>Step-by-Step Deployment</h2>
+
+                    <div class="step-item">
+                        <div class="step-checkbox">
+                            <input type="checkbox" id="step-4-1" class="progress-checkbox" data-module="module4" data-step="1">
+                            <label for="step-4-1"><strong>Step 1: Prepare Lambda Handler</strong></label>
+                        </div>
+                        <div class="step-content">
+                            <p>Create a Lambda-compatible handler for your Strands agent:</p>
+                            <div class="code-block">
+                                <pre><code># lambda_handler_hello.py
+import json
+from strands import Agent
+from strands.models import BedrockModel
+
+# Initialize the Bedrock model outside the handler for warm starts
+# This ensures the model is loaded only once per Lambda instance
+model = BedrockModel(
+    model_id="us.anthropic.claude-3-7-sonnet-20250219-v1:0",
+    temperature=0.3,
+    region_name="us-east-1"  # Adjust region as needed
+)
+
+# Create the agent outside the handler for warm starts
+hello_agent = Agent(
+    name="HelloAgent",
+    model=model,
+    system_prompt="You are a friendly AI assistant that greets users."
+)
+
+def handler(event, context):
+    """Lambda handler function."""
+    # Extract the prompt from the Lambda event
+    try:
+        body = json.loads(event.get('body', '{}'))
+        user_prompt = body.get('prompt', 'Hello!')
+    except json.JSONDecodeError:
+        user_prompt = event.get('prompt', 'Hello!')  # Fallback for direct invocation
+
+    # Invoke the Strands agent
+    response = hello_agent(user_prompt)
+
+    # Return the response in a format API Gateway can understand
+    return {
+        'statusCode': 200,
+        'headers': {
+            'Content-Type': 'application/json'
+        },
+        'body': json.dumps({
+            'response': str(response)
+        })
+    }</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <div class="step-checkbox">
+                            <input type="checkbox" id="step-4-2" class="progress-checkbox" data-module="module4" data-step="2">
+                            <label for="step-4-2"><strong>Step 2: Create Requirements File</strong></label>
+                        </div>
+                        <div class="step-content">
+                            <p>Define dependencies for your Lambda function:</p>
+                            <div class="code-block">
+                                <pre><code># requirements.txt
+strands-agents
+boto3</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <div class="step-checkbox">
+                            <input type="checkbox" id="step-4-3" class="progress-checkbox" data-module="module4" data-step="3">
+                            <label for="step-4-3"><strong>Step 3: Package for Deployment</strong></label>
+                        </div>
+                        <div class="step-content">
+                            <p>Create a deployment package with dependencies:</p>
+                            <div class="code-block">
+                                <pre><code># Create a directory for your deployment package
+mkdir package
+
+# Install dependencies into the 'package' directory
+# Use --platform manylinux2014_x86_64 for x86_64 Lambda architecture
+pip install -r requirements.txt --target package/
+
+# Copy your Lambda handler file into the package directory
+cp lambda_handler_hello.py package/
+
+# Navigate into the package directory
+cd package/
+
+# Zip all contents of the package directory
+zip -r ../hello_agent_lambda.zip .
+
+# Navigate back to the parent directory
+cd ..</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <div class="step-checkbox">
+                            <input type="checkbox" id="step-4-4" class="progress-checkbox" data-module="module4" data-step="4">
+                            <label for="step-4-4"><strong>Step 4: Create IAM Role</strong></label>
+                        </div>
+                        <div class="step-content">
+                            <p>Create an IAM role with necessary permissions:</p>
+                            <div class="code-block">
+                                <pre><code># Create a trust policy for Lambda
+cat << EOF > lambda-trust-policy.json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "lambda.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+
+# Create the IAM role
+aws iam create-role \
+    --role-name StrandsHelloAgentLambdaRole \
+    --assume-role-policy-document file://lambda-trust-policy.json
+
+# Attach the AWSLambdaBasicExecutionRole policy (for CloudWatch Logs)
+aws iam attach-role-policy \
+    --role-name StrandsHelloAgentLambdaRole \
+    --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+# Attach a policy for Bedrock access
+aws iam attach-role-policy \
+    --role-name StrandsHelloAgentLambdaRole \
+    --policy-arn arn:aws:iam::aws:policy/AmazonBedrockFullAccess
+
+# Get the ARN of the created role
+LAMBDA_ROLE_ARN=$(aws iam get-role --role-name StrandsHelloAgentLambdaRole --query 'Role.Arn' --output text)
+echo "Lambda Role ARN: $LAMBDA_ROLE_ARN"</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <div class="step-checkbox">
+                            <input type="checkbox" id="step-4-5" class="progress-checkbox" data-module="module4" data-step="5">
+                            <label for="step-4-5"><strong>Step 5: Deploy Lambda Function</strong></label>
+                        </div>
+                        <div class="step-content">
+                            <p>Create the Lambda function using AWS CLI:</p>
+                            <div class="code-block">
+                                <pre><code>aws lambda create-function \
+    --function-name StrandsHelloAgent \
+    --runtime python3.10 \
+    --role "$LAMBDA_ROLE_ARN" \
+    --handler lambda_handler_hello.handler \
+    --zip-file fileb://hello_agent_lambda.zip \
+    --memory 1024 \
+    --timeout 30 \
+    --environment Variables="{MODEL_ID=us.anthropic.claude-3-7-sonnet-20250219-v1:0,TEMPERATURE=0.3}"</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                            <p><strong>Parameter Explanation:</strong></p>
+                            <ul>
+                                <li><code>--function-name</code>: Unique name for your Lambda function</li>
+                                <li><code>--runtime</code>: Python runtime version</li>
+                                <li><code>--role</code>: ARN of the IAM role created earlier</li>
+                                <li><code>--handler</code>: File and function name (file.function)</li>
+                                <li><code>--memory</code>: Memory allocated (1024 MB recommended for LLM agents)</li>
+                                <li><code>--timeout</code>: Maximum execution time (30 seconds)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="deployment-examples" class="content-section">
+                    <h2>Deployment Examples</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="deployment-examples-review" class="progress-checkbox" data-module="module4" data-step="examples">
+                        <label for="deployment-examples-review">Review deployment examples</label>
+                    </div>
+
+                    <h3>Example 1: Simple Hello Agent</h3>
+                    <p>Basic agent deployment for greeting users:</p>
+                    <div class="code-block">
+                        <pre><code># lambda_handler_hello.py - Complete example
+import json
+import logging
+from strands import Agent
+from strands.models import BedrockModel
+
+# Configure logging
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+# Initialize model and agent outside handler for warm starts
+try:
+    model = BedrockModel(
+        model_id="us.anthropic.claude-3-7-sonnet-20250219-v1:0",
+        temperature=0.3,
+        region_name="us-east-1"
+    )
+    
+    hello_agent = Agent(
+        name="HelloAgent",
+        model=model,
+        system_prompt="You are a friendly AI assistant that greets users warmly."
+    )
+    
+    logger.info("✅ Strands agent initialized successfully")
+    
+except Exception as e:
+    logger.error(f"❌ Failed to initialize agent: {e}")
+    raise
+
+def handler(event, context):
+    """Lambda handler for Hello Agent."""
+    try:
+        logger.info(f"Received event: {json.dumps(event)}")
+        
+        # Extract prompt from event
+        if 'body' in event:
+            body = json.loads(event['body'])
+            user_prompt = body.get('prompt', 'Hello!')
+        else:
+            user_prompt = event.get('prompt', 'Hello!')
+        
+        logger.info(f"Processing prompt: {user_prompt}")
+        
+        # Invoke agent
+        response = hello_agent(user_prompt)
+        logger.info("✅ Agent response generated successfully")
+        
+        return {
+            'statusCode': 200,
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+            'body': json.dumps({
+                'response': str(response),
+                'agent': 'StrandsHelloAgent',
+                'timestamp': context.aws_request_id
+            })
+        }
+        
+    except Exception as e:
+        logger.error(f"❌ Handler error: {e}")
+        return {
+            'statusCode': 500,
+            'headers': {'Content-Type': 'application/json'},
+            'body': json.dumps({
+                'error': str(e),
+                'message': 'Internal server error'
+            })
+        }</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+
+                    <h3>Example 2: Agent with Custom Tools</h3>
+                    <p>Deploy an agent with custom tool capabilities:</p>
+                    <div class="code-block">
+                        <pre><code># lambda_handler_custom_tool.py
+import json
+import logging
+from strands import Agent, tool
+from strands.models import BedrockModel
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+# Define custom tool
+@tool
+def multiply(a: int, b: int) -> int:
+    """Multiplies two integers and returns the result."""
+    return a * b
+
+@tool
+def word_count(text: str) -> int:
+    """Count the number of words in text."""
+    if not isinstance(text, str):
+        return 0
+    return len(text.strip().split())
+
+# Initialize agent with custom tools
+try:
+    model = BedrockModel(
+        model_id="us.anthropic.claude-3-7-sonnet-20250219-v1:0",
+        temperature=0.3,
+        region_name="us-east-1"
+    )
+    
+    math_agent = Agent(
+        name="MathAgent",
+        model=model,
+        system_prompt="You are a helpful assistant with math and text analysis tools.",
+        tools=[multiply, word_count]
+    )
+    
+    logger.info("✅ Custom tool agent initialized successfully")
+    
+except Exception as e:
+    logger.error(f"❌ Failed to initialize custom tool agent: {e}")
+    raise
+
+def handler(event, context):
+    """Lambda handler for Custom Tool Agent."""
+    try:
+        # Extract prompt
+        if 'body' in event:
+            body = json.loads(event['body'])
+            user_prompt = body.get('prompt', 'What is 5 multiplied by 7?')
+        else:
+            user_prompt = event.get('prompt', 'What is 5 multiplied by 7?')
+        
+        logger.info(f"Processing prompt: {user_prompt}")
+        
+        # Invoke agent
+        response = math_agent(user_prompt)
+        
+        return {
+            'statusCode': 200,
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+            'body': json.dumps({
+                'response': str(response),
+                'agent': 'StrandsCustomToolAgent',
+                'tools_available': ['multiply', 'word_count'],
+                'timestamp': context.aws_request_id
+            })
+        }
+        
+    except Exception as e:
+        logger.error(f"❌ Handler error: {e}")
+        return {
+            'statusCode': 500,
+            'headers': {'Content-Type': 'application/json'},
+            'body': json.dumps({'error': str(e)})
+        }</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                </section>
+
+                <section id="testing" class="content-section">
+                    <h2>Testing Deployed Agents</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="testing-review" class="progress-checkbox" data-module="module4" data-step="testing">
+                        <label for="testing-review">Review testing procedures</label>
+                    </div>
+
+                    <h3>Direct Lambda Invocation</h3>
+                    <div class="code-block">
+                        <pre><code># Test Hello Agent
+aws lambda invoke \
+    --function-name StrandsHelloAgent \
+    --payload '{"body": "{\"prompt\": \"Hello Lambda Agent!\"}"}' \
+    output.json
+
+# View the output
+cat output.json</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+
+                    <h3>Test Custom Tool Agent</h3>
+                    <div class="code-block">
+                        <pre><code># Test Custom Tool Agent
+aws lambda invoke \
+    --function-name StrandsCustomToolAgent \
+    --payload '{"body": "{\"prompt\": \"What is 12 multiplied by 9?\"}"}' \
+    output_custom_tool.json
+
+# View the output
+cat output_custom_tool.json</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+
+                    <h3>Expected Output Format</h3>
+                    <div class="code-block">
+                        <pre><code>{
+    "statusCode": 200,
+    "headers": {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*"
+    },
+    "body": "{\"response\": \"Hello! I'm your friendly AI assistant...\", \"agent\": \"StrandsHelloAgent\", \"timestamp\": \"abc123-def456\"}"
+}</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+
+                    <h3>Monitoring and Logs</h3>
+                    <div class="code-block">
+                        <pre><code># View CloudWatch logs
+aws logs describe-log-groups --log-group-name-prefix "/aws/lambda/StrandsHelloAgent"
+
+# Get recent log events
+aws logs filter-log-events \
+    --log-group-name "/aws/lambda/StrandsHelloAgent" \
+    --start-time $(date -d '1 hour ago' +%s)000</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                </section>
+
+                <section id="common-issues" class="content-section">
+                    <h2>Common Issues & Solutions</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="common-issues-review" class="progress-checkbox" data-module="module4" data-step="issues">
+                        <label for="common-issues-review">Review common issues</label>
+                    </div>
+
+                    <h3>Issue: Lambda Function Timeout</h3>
+                    <div class="code-block">
+                        <pre><code>Task timed out after 30.00 seconds</code></pre>
+                    </div>
+                    <p><strong>Solution:</strong> Increase timeout and optimize cold starts:</p>
+                    <div class="code-block">
+                        <pre><code># Update function timeout
+aws lambda update-function-configuration \
+    --function-name StrandsHelloAgent \
+    --timeout 60
+
+# Optimize by initializing outside handler (already shown in examples)</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+
+                    <h3>Issue: Memory Limit Exceeded</h3>
+                    <div class="code-block">
+                        <pre><code>Runtime.ExitError: RequestId: ... Process exited before completing request</code></pre>
+                    </div>
+                    <p><strong>Solution:</strong> Increase memory allocation:</p>
+                    <div class="code-block">
+                        <pre><code># Update function memory
+aws lambda update-function-configuration \
+    --function-name StrandsHelloAgent \
+    --memory-size 2048</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+
+                    <h3>Issue: Bedrock Access Denied</h3>
+                    <div class="code-block">
+                        <pre><code>AccessDeniedException: User is not authorized to perform: bedrock:InvokeModel</code></pre>
+                    </div>
+                    <p><strong>Solution:</strong> Verify IAM permissions and model access:</p>
+                    <div class="code-block">
+                        <pre><code># Check IAM role policies
+aws iam list-attached-role-policies --role-name StrandsHelloAgentLambdaRole
+
+# Ensure Claude 3.7 Sonnet is enabled in Bedrock Console
+# Navigate to: https://console.aws.amazon.com/bedrock/home#/modelaccess</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+
+                    <h3>Issue: Import Errors</h3>
+                    <div class="code-block">
+                        <pre><code>ModuleNotFoundError: No module named 'strands'</code></pre>
+                    </div>
+                    <p><strong>Solution:</strong> Verify deployment package structure:</p>
+                    <div class="code-block">
+                        <pre><code># Check package contents
+unzip -l hello_agent_lambda.zip | head -20
+
+# Ensure strands is in the package root
+# Package structure should be:
+# - lambda_handler_hello.py
+# - strands/
+# - boto3/
+# - other dependencies/</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+
+                    <h3>Issue: JSON Parsing Errors</h3>
+                    <div class="code-block">
+                        <pre><code>json.decoder.JSONDecodeError: Expecting value</code></pre>
+                    </div>
+                    <p><strong>Solution:</strong> Add robust event parsing:</p>
+                    <div class="code-block">
+                        <pre><code>def handler(event, context):
+    try:
+        # Handle different event formats
+        if isinstance(event.get('body'), str):
+            body = json.loads(event['body'])
+        elif isinstance(event.get('body'), dict):
+            body = event['body']
+        else:
+            body = event
+        
+        user_prompt = body.get('prompt', 'Hello!')
+        
+    except (json.JSONDecodeError, KeyError, TypeError) as e:
+        logger.warning(f"Event parsing issue: {e}")
+        user_prompt = event.get('prompt', 'Hello!')  # Fallback</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                </section>
+
+                <section id="cleanup" class="content-section">
+                    <h2>Cleanup Resources</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="cleanup-review" class="progress-checkbox" data-module="module4" data-step="cleanup">
+                        <label for="cleanup-review">Review cleanup procedures</label>
+                    </div>
+
+                    <p>To avoid incurring unnecessary AWS charges, clean up the resources you've created:</p>
+
+                    <h3>Delete Lambda Functions</h3>
+                    <div class="code-block">
+                        <pre><code>aws lambda delete-function --function-name Stran
+dsHelloAgent
+aws lambda delete-function --function-name StrandsCustomToolAgent</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+
+                    <h3>Delete IAM Role and Policies</h3>
+                    <div class="code-block">
+                        <pre><code># Detach policies
+aws iam detach-role-policy \
+    --role-name StrandsHelloAgentLambdaRole \
+    --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+aws iam detach-role-policy \
+    --role-name StrandsHelloAgentLambdaRole \
+    --policy-arn arn:aws:iam::aws:policy/AmazonBedrockFullAccess
+
+# Delete the role
+aws iam delete-role --role-name StrandsHelloAgentLambdaRole</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+
+                    <h3>Remove Local Files</h3>
+                    <div class="code-block">
+                        <pre><code># Clean up local deployment artifacts
+rm -rf package/
+rm hello_agent_lambda.zip
+rm custom_tool_agent_lambda.zip
+rm lambda_handler_hello.py
+rm lambda_handler_custom_tool.py
+rm requirements.txt
+rm lambda-trust-policy.json
+rm output.json
+rm output_custom_tool.json</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                </section>
+
+                <section id="next-steps" class="content-section">
+                    <h2>Next Steps</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="next-steps-review" class="progress-checkbox" data-module="module4" data-step="next">
+                        <label for="next-steps-review">Review next steps</label>
+                    </div>
+                    <p>In Module 5, you'll explore advanced patterns:</p>
+                    <ul>
+                        <li>A2A (Agent-to-Agent) protocol implementation</li>
+                        <li>Decoupled multi-agent architectures</li>
+                        <li>Independent agent servers with HTTP communication</li>
+                        <li>Scalable agent orchestration patterns</li>
+                        <li>Production-ready multi-agent deployments</li>
+                    </ul>
+
+                    <h3>Production Considerations</h3>
+                    <ul>
+                        <li><strong>API Gateway Integration:</strong> Expose your agents as REST APIs</li>
+                        <li><strong>Infrastructure as Code:</strong> Use AWS CDK or SAM for deployment</li>
+                        <li><strong>Monitoring:</strong> Set up CloudWatch alarms and dashboards</li>
+                        <li><strong>Security:</strong> Implement authentication and rate limiting</li>
+                        <li><strong>Cost Optimization:</strong> Monitor usage and optimize memory/timeout</li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+
+        <section class="key-takeaways">
+            <div class="container">
+                <h2>Key Takeaways</h2>
+                <ul>
+                    <li>✅ <strong>Lambda enables serverless agent deployment</strong> - Scalable and cost-effective</li>
+                    <li>✅ <strong>Warm starts optimize performance</strong> - Initialize agents outside handlers</li>
+                    <li>✅ <strong>IAM roles provide secure access</strong> - Fine-grained permissions for Bedrock</li>
+                    <li>✅ <strong>Proper packaging is critical</strong> - Include all dependencies in deployment zip</li>
+                    <li>✅ <strong>Monitoring enables debugging</strong> - CloudWatch logs for troubleshooting</li>
+                </ul>
+                <div class="module-metadata">
+                    <p><strong>Time to Complete:</strong> 30 minutes</p>
+                    <p><strong>Difficulty:</strong> Intermediate</p>
+                    <p><strong>Prerequisites Met:</strong> ✅ Ready for Module 5</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="next-module">
+            <div class="container">
+                <h2>Continue Your Journey</h2>
+                <p>Excellent work! You've successfully deployed Strands agents to AWS Lambda. Ready to explore advanced agent patterns?</p>
+                <div class="module-nav-buttons">
+                    <a href="module3.html" class="btn btn-secondary">← Previous: Module 3</a>
+                    <a href="module5.html" class="btn btn-primary">Continue to Module 5: Advanced →</a>
+                </div>
+                <a href="../troubleshooting.html" class="btn btn-secondary">Need Help?</a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h2>AWS Strands Workshop</h2>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="../index.html">Home</a></li>
+                        <li><a href="../setup.html">Setup Guide</a></li>
+                        <li><a href="module4.html">Module 4: Deployment</a></li>
+                        <li><a href="../troubleshooting.html">Troubleshooting</a></li>
+                    </ul>
+                </div>
+                <div class="footer-resources">
+                    <h3>Additional Resources</h3>
+                    <ul>
+                        <li><a href="https://strandsagents.com/" target="_blank" rel="noopener noreferrer">AWS Strands SDK Documentation</a></li>
+                        <li><a href="https://docs.aws.amazon.com/bedrock/" target="_blank" rel="noopener noreferrer">Amazon Bedrock User Guide</a></li>
+                        <li><a href="https://docs.aws.amazon.com/lambda/" target="_blank" rel="noopener noreferrer">AWS Lambda Developer Guide</a></li>
+                        <li><a href="https://docs.aws.amazon.com/apigateway/" target="_blank" rel="noopener noreferrer">Amazon API Gateway Documentation</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 AWS Strands Workshop. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Prism.js for syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+    
+    <!-- Diagram Renderer for Interactive Visualizations -->
+    <script src="../scripts/diagram-renderer.js"></script>
+    
+    <!-- Main JavaScript functionality -->
+    <script src="../scripts/main.js"></script>
+</body>
+</html>

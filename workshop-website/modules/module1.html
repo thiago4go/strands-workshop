@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 1: Hello Agent - AWS Strands AI Agents Workshop</title>
+    <meta name="description" content="Learn to create your first AI agent with AWS Strands SDK">
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="../styles/main.css">
+</head>
+<body data-module="module1">
+    <header>
+        <nav class="main-nav">
+            <div class="container">
+                <div class="logo">
+                    <a href="../index.html">
+                        <h1>AWS Strands Workshop</h1>
+                    </a>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="../setup.html">Setup Guide</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" aria-haspopup="true" aria-expanded="false">Modules</a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="module1.html" class="active" role="menuitem" aria-current="page">Module 1: Basics</a></li>
+                            <li><a href="module2.html" role="menuitem">Module 2: Tools</a></li>
+                            <li><a href="module3.html" role="menuitem">Module 3: Multi-Agent</a></li>
+                            <li><a href="module4.html" role="menuitem">Module 4: Deployment</a></li>
+                            <li><a href="module5.html" role="menuitem">Module 5: Advanced</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="../troubleshooting.html">Troubleshooting</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="module-header">
+            <div class="container">
+                <div class="module-badge">Module 1</div>
+                <h1>Hello Agent - Your First Strands Agent</h1>
+                <div class="module-meta">
+                    <span><i class="icon-clock"></i> 10 minutes</span>
+                    <span><i class="icon-level"></i> Beginner</span>
+                    <span>Act I: The Single Agent</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="module-navigation">
+            <div class="container">
+                <nav class="module-nav">
+                    <ul>
+                        <li><a href="#learning-objectives">Learning Objectives</a></li>
+                        <li><a href="#prerequisites">Prerequisites</a></li>
+                        <li><a href="#step-by-step">Step-by-Step</a></li>
+                        <li><a href="#code-examples">Code Examples</a></li>
+                        <li><a href="#understanding">Understanding the Code</a></li>
+                        <li><a href="#common-issues">Common Issues</a></li>
+                        <li><a href="#next-steps">Next Steps</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </section>
+
+        <div class="module-content">
+            <div class="container">
+                <div class="module-progress">
+                    <div class="progress-header">
+                        <h3>Your Progress</h3>
+                        <span class="progress-percentage">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-bar-fill"></div>
+                    </div>
+                </div>
+
+                <section id="learning-objectives" class="content-section">
+                    <h2>Learning Objectives</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="objectives-read" class="progress-checkbox" data-module="module1" data-step="objectives">
+                        <label for="objectives-read">Review learning objectives</label>
+                    </div>
+                    <ul>
+                        <li>Create your first working Strands agent</li>
+                        <li>Understand the model-driven approach</li>
+                        <li>Configure AWS Bedrock with Claude 3.7 Sonnet</li>
+                        <li>Run and test a basic agent</li>
+                    </ul>
+                </section>
+
+                <section id="prerequisites" class="content-section">
+                    <h2>Prerequisites</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="prerequisites-check" class="progress-checkbox" data-module="module1" data-step="prerequisites">
+                        <label for="prerequisites-check">Verify prerequisites are met</label>
+                    </div>
+                    <ul>
+                        <li>Python 3.10+ installed</li>
+                        <li>AWS credentials configured</li>
+                        <li>Virtual environment activated</li>
+                        <li>Strands SDK installed</li>
+                    </ul>
+                </section>
+
+                <section id="step-by-step" class="content-section">
+                    <h2>Step-by-Step Instructions</h2>
+
+                    <div class="step-item">
+                        <div class="step-checkbox">
+                            <input type="checkbox" id="step-1-1" class="progress-checkbox" data-module="module1" data-step="1">
+                            <label for="step-1-1"><strong>Step 1: Verify Environment Setup</strong></label>
+                        </div>
+                        <div class="step-content">
+                            <p>First, ensure your environment is properly configured:</p>
+                            <div class="code-block">
+                                <pre><code># Check Python version (must be 3.10+)
+python --version
+
+# Verify virtual environment is activated
+which python  # Should show path to .venv
+
+# Check Strands installation
+python -c "from strands import Agent; print('Strands SDK installed successfully')"</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <div class="step-checkbox">
+                            <input type="checkbox" id="step-1-2" class="progress-checkbox" data-module="module1" data-step="2">
+                            <label for="step-1-2"><strong>Step 2: Configure AWS Credentials</strong></label>
+                        </div>
+                        <div class="step-content">
+                            <p>Ensure AWS credentials are configured with Bedrock permissions:</p>
+                            <div class="code-block">
+                                <pre><code># Check AWS credentials
+aws sts get-caller-identity
+
+# Verify region (default of strands is us-west-2)
+aws configure get region</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                            <p><strong>Required IAM Permissions:</strong></p>
+                            <ul>
+                                <li><code>bedrock:InvokeModel</code></li>
+                                <li><code>bedrock:ListFoundationModels</code></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <div class="step-checkbox">
+                            <input type="checkbox" id="step-1-3" class="progress-checkbox" data-module="module1" data-step="3">
+                            <label for="step-1-3"><strong>Step 3: Create Your First Agent</strong></label>
+                        </div>
+                        <div class="step-content">
+                            <p>Create <code>exercise1-hello-agent.py</code>:</p>
+                            <div class="code-block">
+                                <pre><code>from strands import Agent
+
+# Create an agent with default settings (uses Bedrock + Claude 3.7 Sonnet)
+agent = Agent()
+
+# Ask the agent a question
+response = agent("Tell me about agentic AI in exactly 50 words")
+print(response)</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                            <p><strong>Key Points:</strong></p>
+                            <ul>
+                                <li>Default model: Claude 3.7 Sonnet in us-west-2 region</li>
+                                <li>No explicit model configuration needed for basic usage</li>
+                                <li>Agent automatically handles conversation context</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <div class="step-checkbox">
+                            <input type="checkbox" id="step-1-4" class="progress-checkbox" data-module="module1" data-step="4">
+                            <label for="step-1-4"><strong>Step 4: Run Your Agent</strong></label>
+                        </div>
+                        <div class="step-content">
+                            <p>Execute the agent:</p>
+                            <div class="code-block">
+                                <pre><code>python -u exercise1-hello-agent.py</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                            <p><strong>Expected Output:</strong></p>
+                            <div class="code-block">
+                                <pre><code>Agentic AI refers to artificial intelligence systems that can act autonomously, make decisions, and take actions to achieve goals. Unlike traditional AI that simply responds to prompts, agentic AI can plan, reason, use tools, and interact with environments to complete complex tasks independently and adaptively.</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="code-examples" class="content-section">
+                    <h2>Enhanced Agent with Explicit Configuration</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="code-examples-review" class="progress-checkbox" data-module="module1" data-step="examples">
+                        <label for="code-examples-review">Review code examples</label>
+                    </div>
+
+                    <h3>Option A: AWS Bedrock Configuration</h3>
+                    <div class="code-block">
+                        <pre><code>from strands import Agent
+from strands.models import BedrockModel
+
+# Create a BedrockModel with explicit configuration
+bedrock_model = BedrockModel(
+    model_id="us.anthropic.claude-3-7-sonnet-20250219-v1:0",
+    region_name='us-east-1',
+    temperature=0.3,
+    max_tokens=200
+)
+
+# Create agent with the configured model
+agent = Agent(model=bedrock_model)
+
+# Test with multiple questions
+questions = [
+    "What is the capital of France?",
+    "Explain machine learning in one sentence.",
+    "What's 15 * 23?"
+]
+
+for question in questions:
+    print(f"Q: {question}")
+    response = agent(question)
+    print(f"A: {response}\n")</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+
+                    <h3>Option B: OpenAI Configuration</h3>
+                    <div class="code-block">
+                        <pre><code>import os
+from strands import Agent
+from strands.models.openai import OpenAIModel
+
+# First, install OpenAI support: pip install 'strands-agents[openai]'
+# Set your API key: export OPENAI_API_KEY="sk-..."
+
+# Create an OpenAI model with explicit configuration
+openai_model = OpenAIModel(
+    client_args={
+        "api_key": os.getenv("OPENAI_API_KEY"),
+    },
+    model_id="gpt-4o-mini",  # Cost-effective option
+    params={
+        "temperature": 0.3,
+        "max_tokens": 200,
+    }
+)
+
+# Create agent with the configured model
+agent = Agent(model=openai_model)
+
+# Test with the same questions
+questions = [
+    "What is the capital of France?",
+    "Explain machine learning in one sentence.",
+    "What's 15 * 23?"
+]
+
+for question in questions:
+    print(f"Q: {question}")
+    response = agent(question)
+    print(f"A: {response}\n")</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                </section>
+
+                <section id="understanding" class="content-section">
+                    <h2>Understanding the Code</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="understanding-review" class="progress-checkbox" data-module="module1" data-step="understanding">
+                        <label for="understanding-review">Review code explanations</label>
+                    </div>
+
+                    <h3>Agent Class</h3>
+                    <ul>
+                        <li><code>Agent()</code> - Creates agent with default Bedrock configuration</li>
+                        <li><code>Agent(model=model)</code> - Creates agent with specific model</li>
+                        <li><code>agent(message)</code> - Sends message and returns response</li>
+                    </ul>
+
+                    <h3>BedrockModel Parameters</h3>
+                    <ul>
+                        <li><code>model_id</code> - Specific Claude model version</li>
+                        <li><code>region_name</code> - AWS region (us-east-1, us-west-2)</li>
+                        <li><code>temperature</code> - Response randomness (0.0-1.0)</li>
+                        <li><code>max_tokens</code> - Maximum response length</li>
+                    </ul>
+
+                    <h3>Model-Driven Approach</h3>
+                    <p>Unlike workflow-based frameworks, Strands uses the model's native reasoning:</p>
+                    <ul>
+                        <li>No rigid conversation flows</li>
+                        <li>Model decides how to respond</li>
+                        <li>Natural conversation handling</li>
+                    </ul>
+                </section>
+
+                <section id="common-issues" class="content-section">
+                    <h2>Common Issues & Solutions</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="common-issues-review" class="progress-checkbox" data-module="module1" data-step="issues">
+                        <label for="common-issues-review">Review common issues</label>
+                    </div>
+
+                    <h3>Issue: ModuleNotFoundError</h3>
+                    <div class="code-block">
+                        <pre><code>ModuleNotFoundError: No module named 'strands'</code></pre>
+                    </div>
+                    <p><strong>Solution:</strong> Install in activated virtual environment:</p>
+                    <div class="code-block">
+                        <pre><code>source .venv/bin/activate
+pip install strands-agents</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+
+                    <h3>Issue: AWS Credentials Error</h3>
+                    <div class="code-block">
+                        <pre><code>NoCredentialsError: Unable to locate credentials</code></pre>
+                    </div>
+                    <p><strong>Solution:</strong> Configure AWS credentials:</p>
+                    <div class="code-block">
+                        <pre><code>aws configure
+# OR set environment variables:
+export AWS_ACCESS_KEY_ID=your_key
+export AWS_SECRET_ACCESS_KEY=your_secret</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+
+                    <h3>Issue: Bedrock Access Denied</h3>
+                    <div class="code-block">
+                        <pre><code>AccessDeniedException: User is not authorized to perform: bedrock:InvokeModel</code></pre>
+                    </div>
+                    <p><strong>Solution:</strong></p>
+                    <ol>
+                        <li>Enable Claude 3.7 Sonnet in <a href="https://us-west-2.console.aws.amazon.com/bedrock/home?region=us-west-2#/modelaccess" target="_blank" rel="noopener noreferrer">Bedrock Console</a></li>
+                        <li>Add IAM permissions for <code>bedrock:InvokeModel</code></li>
+                    </ol>
+                </section>
+
+                <section id="next-steps" class="content-section">
+                    <h2>Next Steps</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="next-steps-review" class="progress-checkbox" data-module="module1" data-step="next">
+                        <label for="next-steps-review">Review next steps</label>
+                    </div>
+                    <p>In Module 2, you'll learn to:</p>
+                    <ul>
+                        <li>Add tools to your agent</li>
+                        <li>Create custom functions</li>
+                        <li>Handle file operations</li>
+                        <li>Build more complex interactions</li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+
+        <section class="key-takeaways">
+            <div class="container">
+                <h2>Key Takeaways</h2>
+                <ul>
+                    <li>✅ <strong>Strands agents are simple to create</strong> - Just <code>Agent()</code> works</li>
+                    <li>✅ <strong>Model-driven approach</strong> - No complex workflows needed</li>
+                    <li>✅ <strong>AWS Bedrock integration</strong> - Enterprise-grade models</li>
+                    <li>✅ <strong>Flexible configuration</strong> - Customize as needed</li>
+                </ul>
+                <div class="module-metadata">
+                    <p><strong>Time to Complete:</strong> 10 minutes</p>
+                    <p><strong>Difficulty:</strong> Beginner</p>
+                    <p><strong>Prerequisites Met:</strong> ✅ Ready for Module 2</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="next-module">
+            <div class="container">
+                <h2>Continue Your Journey</h2>
+                <p>Great job completing Module 1! You've successfully created your first Strands agent.</p>
+                <a href="module2.html" class="btn btn-primary">Continue to Module 2: Custom Tools</a>
+                <a href="../troubleshooting.html" class="btn btn-secondary">Need Help?</a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h2>AWS Strands Workshop</h2>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="../index.html">Home</a></li>
+                        <li><a href="../setup.html">Setup Guide</a></li>
+                        <li><a href="module1.html">Module 1: Basics</a></li>
+                        <li><a href="../troubleshooting.html">Troubleshooting</a></li>
+                    </ul>
+                </div>
+                <div class="footer-resources">
+                    <h3>Additional Resources</h3>
+                    <ul>
+                        <li><a href="https://strandsagents.com/" target="_blank" rel="noopener noreferrer">AWS Strands SDK Documentation</a></li>
+                        <li><a href="https://docs.aws.amazon.com/bedrock/" target="_blank" rel="noopener noreferrer">Amazon Bedrock User Guide</a></li>
+                        <li><a href="https://modelcontextprotocol.io/" target="_blank" rel="noopener noreferrer">Model Context Protocol (MCP) Documentation</a></li>
+                        <li><a href="https://github.com/a2aproject/A2A" target="_blank" rel="noopener noreferrer">A2A Protocol Documentation</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 AWS Strands Workshop. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Prism.js for syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+    
+    <!-- Diagram Renderer for Interactive Visualizations -->
+    <script src="../scripts/diagram-renderer.js"></script>
+    
+    <!-- Main JavaScript functionality -->
+    <script src="../scripts/main.js"></script>
+</body>
+</html>

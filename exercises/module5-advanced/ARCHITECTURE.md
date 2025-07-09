@@ -1,443 +1,341 @@
-# Module 5: A2A Preview - Architecture
+# A2A Research Team Architecture - Production Implementation
 
-## Overview
-This module demonstrates the A2A (Agent-to-Agent) protocol with a subprocess-based architecture where agents run as independent processes and communicate via the standard A2A SDK protocol.
+This document describes the **production-ready** architecture of the A2A (Agent-to-Agent) multi-agent research system using the Strands Agents SDK, incorporating current best practices and acknowledging the experimental nature of A2A support.
 
-## Architecture Diagram
+## ⚠️ **IMPORTANT: Experimental Feature Warning**
 
-```mermaid
-graph TB
-    User[👤 User Request] --> MainProcess[🚀 Main Process<br/>main.py]
-    MainProcess --> |subprocess.Popen| ResearchProcess[🔬 Research Agent<br/>research_agent.py]
-    MainProcess --> |subprocess.Popen| AnalysisProcess[📊 Analysis Agent<br/>analysis_agent.py]
-    MainProcess --> |subprocess.Popen| FactCheckProcess[✅ Fact-Check Agent<br/>factcheck_agent.py]
-    MainProcess --> |subprocess.Popen| QAProcess[⭐ QA Agent<br/>qa_agent.py]
-    MainProcess --> |subprocess.Popen| OrchestratorProcess[🎯 Orchestrator Agent<br/>orchestrator.py]
-    
-    MainProcess --> |a2a.discover()| A2ADiscovery[🔍 A2A Agent Discovery]
-    A2ADiscovery --> OrchestratorProxy[📞 Orchestrator Proxy<br/>Remote Method Calls]
-    
-    OrchestratorProxy --> |A2A Protocol| ResearchAgent[ResearchSpecialist]
-    OrchestratorProxy --> |A2A Protocol| AnalysisAgent[AnalysisSpecialist]
-    OrchestratorProxy --> |A2A Protocol| FactCheckAgent[FactCheckSpecialist]
-    OrchestratorProxy --> |A2A Protocol| QAAgent[QualityAssuranceSpecialist]
-    
-    ResearchAgent --> MCPDocker1[🐳 DuckDuckGo MCP<br/>Docker Container]
-    FactCheckAgent --> MCPDocker2[🐳 DuckDuckGo MCP<br/>Docker Container]
-    
-    ResearchAgent --> Bedrock1[☁️ AWS Bedrock<br/>Claude 3.7 Sonnet]
-    AnalysisAgent --> Bedrock2[☁️ AWS Bedrock<br/>Claude 3.7 Sonnet]
-    FactCheckAgent --> Bedrock3[☁️ AWS Bedrock<br/>Claude 3.7 Sonnet]
-    QAAgent --> Bedrock4[☁️ AWS Bedrock<br/>Claude 3.7 Sonnet]
-    OrchestratorProcess --> Bedrock5[☁️ AWS Bedrock<br/>Claude 3.7 Sonnet]
-    
-    OrchestratorProxy --> Results[📋 Aggregated Results]
-    Results --> MainProcess
-    MainProcess --> User
-    
-    subgraph "Independent Agent Processes"
-        ResearchProcess
-        AnalysisProcess
-        FactCheckProcess
-        QAProcess
-        OrchestratorProcess
-    end
-    
-    subgraph "A2A Communication Layer"
-        A2ADiscovery
-        OrchestratorProxy
-        ResearchAgent
-        AnalysisAgent
-        FactCheckAgent
-        QAAgent
-    end
-    
-    subgraph "External Tools & Services"
-        MCPDocker1
-        MCPDocker2
-        Bedrock1
-        Bedrock2
-        Bedrock3
-        Bedrock4
-        Bedrock5
-    end
-    
-    style User fill:#e1f5fe
-    style MainProcess fill:#f3e5f5
-    style OrchestratorProcess fill:#e8f5e8
-    style ResearchProcess fill:#fff3e0
-    style AnalysisProcess fill:#fce4ec
-    style FactCheckProcess fill:#e3f2fd
-    style QAProcess fill:#f1f8e9
-    style A2ADiscovery fill:#f9fbe7
-    style OrchestratorProxy fill:#e8f5e8
+**From Official Strands Documentation:**
+
+> **"A2A support in Strands is currently EXPERIMENTAL. APIs may change, and additional functionality will be added in future releases. If you encounter bugs or have feature requests, please report them on GitHub."**
+
+### Implications for This Implementation:
+- **API Stability**: The A2A interfaces may undergo breaking changes in future SDK releases
+- **Production Readiness**: While functional, this implementation should be considered experimental
+- **Evolution**: The Strands project is continuously evolving, and A2A patterns may change significantly
+- **Feedback Loop**: Users are encouraged to report issues and contribute to the development process
+
+## ✅ Current Implementation Status
+
+**WORKING WITH EXPERIMENTAL COMPONENTS**: All components are functional but subject to change:
+
+| Component | Status | Stability Level | Notes |
+|-----------|--------|-----------------|-------|
+| `A2AServer` | ✅ **Working** | Experimental | HTTP servers exposing Strands agents via A2A protocol |
+| `StrandsA2AExecutor` | ✅ **Working** | Experimental | Handles agent execution in A2A context |
+| `A2AClient` | ✅ **Working** | Stable | Official client from a2a-sdk package |
+| `A2ACardResolver` | ✅ **Working** | Stable | Service discovery via Agent Cards |
+| Security | ✅ **Secure** | Production | No hardcoded credentials, uses AWS configuration |
+| Testing | ✅ **Complete** | Production | Individual and integration testing available |
+
+## System Architecture Overview
+
+The system implements a distributed multi-agent architecture following **current A2A best practices** while acknowledging experimental limitations:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    A2A Research Team System (Experimental)                  │
+│                        Built with Strands SDK 0.2.1                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────┐    HTTP/JSON-RPC 2.0    ┌─────────────────┐
+│   Orchestrator  │◄─────────────────────────│ Research Agent  │
+│     Client      │      (A2A Protocol)      │ A2AServer:9001  │
+│  (A2AClient)    │                          │ + Bedrock       │
+└─────────────────┘                          └─────────────────┘
+         │                                            │
+         │ Service Discovery                          │ StrandsA2AExecutor
+         │ /.well-known/agent.json                    ▼
+         │                                   ┌─────────────────┐
+         │                                   │ Claude 3.7      │
+         │                                   │ Sonnet Model    │
+         │                                   └─────────────────┘
+         │
+         ├─────────────────────────────────► ┌─────────────────┐
+         │        Parallel A2A Calls         │ Analysis Agent  │
+         │                                   │ A2AServer:9002  │
+         │                                   │ + Bedrock       │
+         │                                   └─────────────────┘
+         │
+         ├─────────────────────────────────► ┌─────────────────┐
+         │                                   │ Fact-Check      │
+         │                                   │ A2AServer:9003  │
+         │                                   │ + Bedrock       │
+         │                                   └─────────────────┘
+         │
+         └─────────────────────────────────► ┌─────────────────┐
+                                             │ QA Agent        │
+                                             │ A2AServer:9004  │
+                                             │ + Bedrock       │
+                                             └─────────────────┘
 ```
 
-## Key Components
+## A2A Protocol Implementation - Current Best Practices
 
-### 1. Main Process Entry Point
+### 1. A2AServer Implementation (Experimental Component)
+
+**Current Implementation Pattern:**
 ```python
-# main.py
-import subprocess
-import time
-from strands.multiagent import a2a
-import logging
+from strands.multiagent.a2a import A2AServer
 
-def run_a2a_research_team(topic: str):
-    """
-    Starts all A2A agent processes, orchestrates a research task,
-    and then terminates the agent processes.
-    """
-    processes = []
-    try:
-        logger.info("Starting A2A agent processes...")
-        # Start each agent in a separate subprocess
-        processes.append(subprocess.Popen(["python3", "research_agent.py"], cwd="./src"))
-        processes.append(subprocess.Popen(["python3", "analysis_agent.py"], cwd="./src"))
-        processes.append(subprocess.Popen(["python3", "factcheck_agent.py"], cwd="./src"))
-        processes.append(subprocess.Popen(["python3", "qa_agent.py"], cwd="./src"))
-        processes.append(subprocess.Popen(["python3", "orchestrator.py"], cwd="./src"))
-
-        # Wait for agents to initialize
-        time.sleep(15)
-
-        # Discover the Orchestrator agent via A2A
-        orchestrator = a2a.discover("ResearchOrchestrator")
-
-        # Call the Orchestrator agent to conduct research
-        result = orchestrator(topic)
-        print(result)
-
-    except Exception as e:
-        logger.error(f"An error occurred during A2A research: {e}")
-    finally:
-        # Terminate all subprocesses
-        for process in processes:
-            if process.poll() is None:
-                process.terminate()
-                process.wait()
-```
-
-### 2. Orchestrator Agent
-```python
-# src/orchestrator.py
-from strands import Agent
-from strands.multiagent import a2a
-from strands.models import BedrockModel
-
-model = BedrockModel(
-    model_id="us.anthropic.claude-3-7-sonnet-20250219-v1:0",
-    temperature=0.3
-)
-
-orchestrator = Agent(
-    name="ResearchOrchestrator",
-    model=model,
-    system_prompt="""You are a Research Orchestrator managing a team of specialist agents.
-    You have access to these specialist agents:
-    - ResearchSpecialist: Performs web research using DuckDuckGo search
-    - AnalysisSpecialist: Analyzes research data using sequential thinking
-    - FactCheckSpecialist: Fact-checks claims using DuckDuckGo search
-    - QualityAssuranceSpecialist: Assesses research quality and completeness
-
-    Your coordination strategy:
-    1. For any research request, use ResearchSpecialist to gather information.
-    2. Use AnalysisSpecialist to process and synthesize the research data.
-    3. For complex topics, use FactCheckSpecialist to verify key claims.
-    4. Use QualityAssuranceSpecialist to ensure research meets high standards.
-    5. Coordinate intelligently based on the complexity and requirements.
-
-    You will communicate with these agents using the A2A protocol.
-    """
-)
-
-if __name__ == "__main__":
-    # Start the A2A listener for the orchestrator agent
-    a2a.listen(agent=orchestrator)
-```
-
-### 3. Research Agent
-```python
-# src/research_agent.py
-from strands import Agent
-from strands.multiagent import a2a
-from strands.models import BedrockModel
-from strands.tools.mcp import MCPClient
-from mcp import stdio_client, StdioServerParameters
-
-model = BedrockModel(
-    model_id="us.anthropic.claude-3-7-sonnet-20250219-v1:0",
-    temperature=0.3
-)
-
-# Setup MCP client for DuckDuckGo search
-duckduckgo_client = MCPClient(lambda: stdio_client(
-    StdioServerParameters(
-        command="docker",
-        args=["run", "-i", "--rm", "mcp/duckduckgo"]
-    )
-))
-
-research_agent = Agent(
-    name="ResearchSpecialist",
-    model=model,
-    system_prompt="""You are a specialized Research Agent.
-    Your expertise is to perform web research using the DuckDuckGo search tool.
-    You will be given a topic and you need to return a comprehensive research finding with source attribution.""",
-    tools=duckduckgo_client.list_tools_sync()
-)
-
-if __name__ == "__main__":
-    a2a.listen(agent=research_agent)
-```
-
-### 4. Analysis Agent
-```python
-# src/analysis_agent.py
-from strands import Agent
-from strands.multiagent import a2a
-from strands.models import BedrockModel
-from strands.tools.mcp import MCPClient
-from mcp import stdio_client, StdioServerParameters
-
-model = BedrockModel(
-    model_id="us.anthropic.claude-3-7-sonnet-20250219-v1:0",
-    temperature=0.3
-)
-
-# Setup MCP client for sequential thinking
-mcp_client = MCPClient(lambda: stdio_client(
-    StdioServerParameters(
-        command="docker",
-        args=["run", "-i", "--rm", "mcp/sequentialthinking"]
-    )
-))
-
-analysis_agent = Agent(
-    name="AnalysisSpecialist",
-    model=model,
-    system_prompt="""You are a specialized Analysis Agent.
-    Your expertise is to analyze research data and extract key insights.
-    You will use sequential thinking to provide structured analysis.""",
-    tools=mcp_client.list_tools_sync()
-)
-
-if __name__ == "__main__":
-    a2a.listen(agent=analysis_agent)
-```
-
-### 5. Fact-Check Agent
-```python
-# src/factcheck_agent.py
-from strands import Agent
-from strands.multiagent import a2a
-from strands.models import BedrockModel
-from strands.tools.mcp import MCPClient
-from mcp import stdio_client, StdioServerParameters
-
-model = BedrockModel(
-    model_id="us.anthropic.claude-3-7-sonnet-20250219-v1:0",
-    temperature=0.3
-)
-
-# Setup MCP client for DuckDuckGo search
-duckduckgo_client = MCPClient(lambda: stdio_client(
-    StdioServerParameters(
-        command="docker",
-        args=["run", "-i", "--rm", "mcp/duckduckgo"]
-    )
-))
-
-factcheck_agent = Agent(
-    name="FactCheckSpecialist",
-    model=model,
-    system_prompt="""You are a specialized Fact-Checking Agent.
-    Your expertise is to verify claims using web search and provide accuracy assessments.""",
-    tools=duckduckgo_client.list_tools_sync()
-)
-
-if __name__ == "__main__":
-    a2a.listen(agent=factcheck_agent)
-```
-
-### 6. Quality Assurance Agent
-```python
-# src/qa_agent.py
-from strands import Agent
-from strands.multiagent import a2a
-from strands.models import BedrockModel
-
-model = BedrockModel(
-    model_id="us.anthropic.claude-3-7-sonnet-20250219-v1:0",
-    temperature=0.3
-)
-
-qa_agent = Agent(
-    name="QualityAssuranceSpecialist",
-    model=model,
-    system_prompt="""You are a specialized Quality Assurance Agent.
-    Your expertise is to assess the quality and completeness of research work.
-    You ensure high standards and identify areas for improvement."""
-)
-
-if __name__ == "__main__":
-    a2a.listen(agent=qa_agent)
-```
-
-## A2A Protocol Implementation
-
-### Agent Discovery Pattern
-```python
-# Main process discovers agents using A2A
-orchestrator = a2a.discover("ResearchOrchestrator")
-
-# Direct method invocation on remote agent
-result = orchestrator(research_topic)
-```
-
-### Agent Registration Pattern
-```python
-# Each agent registers itself with A2A listener
-if __name__ == "__main__":
-    a2a.listen(agent=agent_instance)
-```
-
-### Communication Flow
-1. **Process Launch**: Main process starts all agent subprocesses using `subprocess.Popen`
-2. **Agent Registration**: Each agent calls `a2a.listen()` to register with A2A protocol
-3. **Discovery**: Main process uses `a2a.discover()` to find the orchestrator
-4. **Remote Invocation**: Main process calls orchestrator methods via A2A proxy
-5. **Inter-Agent Communication**: Orchestrator coordinates with specialist agents via A2A
-6. **Process Cleanup**: Main process terminates all subprocesses on completion
-
-## Dependencies and Installation
-
-### Required Packages
-```bash
-pip install strands-agents[a2a]  # Core SDK with A2A support
-pip install a2a-sdk[sql]         # A2A SDK with database support
-pip install mcp[cli]             # Model Context Protocol
-```
-
-### Docker Requirements
-- Docker engine for MCP tool containers
-- `mcp/duckduckgo` image for web search
-- `mcp/sequentialthinking` image for structured analysis
-
-### AWS Configuration
-- AWS Bedrock access with Claude 3.7 Sonnet enabled
-- Proper AWS credentials configured
-- US region access for Bedrock
-
-## Error Handling & Resilience
-
-### Process Management
-```python
+# Best Practice: Defensive initialization with error handling
 try:
-    # Start agent processes
-    processes = []
-    for agent_script in agent_scripts:
-        process = subprocess.Popen(["python3", agent_script], cwd="./src")
-        processes.append(process)
+    a2a_server = A2AServer(
+        agent=strands_agent,           # Required: Strands Agent instance
+        host="localhost",              # Explicit host specification
+        port=9001,                     # Unique port per agent
+        version="0.0.1"                # Version for compatibility tracking
+    )
     
-    # Agent discovery and execution
-    orchestrator = a2a.discover("ResearchOrchestrator")
-    result = orchestrator(topic)
+    # Verify server creation before starting
+    agent_card = a2a_server.public_agent_card
+    logger.info(f"Agent card generated: {agent_card.name}")
+    
+    # Start server with proper error handling
+    a2a_server.serve()
     
 except Exception as e:
-    logger.error(f"A2A research failed: {e}")
-finally:
-    # Ensure all processes are terminated
-    for process in processes:
-        if process.poll() is None:
-            process.terminate()
-            process.wait()
+    logger.error(f"A2AServer initialization failed: {e}")
+    # Implement fallback or graceful degradation
 ```
 
-### Timeout Handling
-- 15-second initialization wait for agent startup
-- Graceful process termination on completion or error
-- Process health checking with `poll()`
+**Available Methods (Subject to Change):**
+- `serve()` - Start the HTTP server (blocking)
+- `public_agent_card` - Get the agent card metadata
+- `to_fastapi_app()` - Convert to FastAPI app (experimental)
+- `to_starlette_app()` - Convert to Starlette app (experimental)
 
-## Performance Considerations
+### 2. Agent Card Standards (Stable Component)
 
-### Resource Optimization
-- **Shared Model Instances**: Single Bedrock model per agent to reduce memory
-- **Process Isolation**: Each agent runs in separate subprocess for stability
-- **Docker Caching**: MCP containers benefit from Docker layer caching
+Each A2AServer exposes standardized metadata at `/.well-known/agent.json`:
 
-### Scalability Patterns
-- **Horizontal Scaling**: Multiple instances of specialist agents
-- **Load Distribution**: Different topics can be processed in parallel
-- **Resource Pooling**: Docker containers can be reused across requests
-
-## Production Deployment
-
-### Container Deployment
-```dockerfile
-FROM python:3.10-slim
-
-WORKDIR /app
-
-# Install dependencies
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-
-# Copy application
-COPY main.py .
-COPY src/ ./src/
-
-# Ensure Docker is available for MCP tools
-RUN apt-get update && apt-get install -y docker.io
-
-CMD ["python", "main.py"]
+```json
+{
+  "name": "ResearchSpecialist",
+  "description": "A specialized research agent that performs comprehensive web research and analysis",
+  "version": "0.0.1",
+  "protocolVersion": "0.2.5",
+  "url": "http://localhost:9001/",
+  "capabilities": {},
+  "skills": [],
+  "defaultInputModes": ["text"],
+  "defaultOutputModes": ["text"]
+}
 ```
 
-### Environment Variables
+**Best Practice**: Always include comprehensive descriptions and version information for forward compatibility.
+
+### 3. A2A Client Communication (Stable Component)
+
+**Recommended Implementation Pattern:**
+```python
+from a2a.client import A2AClient, A2ACardResolver
+from a2a.types import MessageSendParams, SendMessageRequest
+import httpx
+from uuid import uuid4
+
+async def communicate_with_agent(base_url: str, message: str) -> str:
+    """
+    Best practice A2A client implementation with proper error handling
+    """
+    try:
+        async with httpx.AsyncClient(timeout=60.0) as http_client:
+            # Service discovery
+            resolver = A2ACardResolver(http_client, base_url=base_url)
+            agent_card = await resolver.get_agent_card()
+            
+            # Verify compatibility
+            if not agent_card.name:
+                raise ValueError("Invalid agent card received")
+            
+            # Create client
+            client = A2AClient(http_client, agent_card)
+            
+            # Send message with proper structure
+            request = SendMessageRequest(
+                id=str(uuid4()),
+                params=MessageSendParams(
+                    message={
+                        "role": "user",
+                        "parts": [{"kind": "text", "text": message}],
+                        "messageId": uuid4().hex,
+                    }
+                ),
+            )
+            
+            response = await client.send_message(request)
+            
+            # Extract response safely
+            if response.result and response.result.message and response.result.message.parts:
+                response_text = ""
+                for part in response.result.message.parts:
+                    if part.kind == "text":
+                        response_text += part.text
+                return response_text
+            else:
+                raise ValueError("Empty response from agent")
+                
+    except Exception as e:
+        logger.error(f"A2A communication failed: {e}")
+        # Implement retry logic or fallback
+        raise
+```
+
+## Current Agent Implementations
+
+### Research Specialist (Port 9001)
+- **Purpose**: Comprehensive research and analysis
+- **Model**: Claude 3.7 Sonnet (temperature: 0.3, region: us-west-2)
+- **Capabilities**: Topic analysis, information synthesis, structured reporting
+- **A2A Status**: Experimental wrapper around stable Strands agent
+
+### Analysis Specialist (Port 9002)  
+- **Purpose**: Deep data analysis and insights
+- **Model**: Claude 3.7 Sonnet (temperature: 0.3, region: us-west-2)
+- **Capabilities**: Pattern identification, strategic analysis, recommendations
+- **A2A Status**: Experimental wrapper around stable Strands agent
+
+### Fact-Check Specialist (Port 9003)
+- **Purpose**: Information verification and accuracy assessment
+- **Model**: Claude 3.7 Sonnet (temperature: 0.2, region: us-west-2)
+- **Capabilities**: Claim verification, source assessment, accuracy reporting
+- **A2A Status**: Experimental wrapper around stable Strands agent
+
+### QA Specialist (Port 9004)
+- **Purpose**: Quality assurance and validation
+- **Model**: Claude 3.7 Sonnet (temperature: 0.2, region: us-west-2)
+- **Capabilities**: Quality assessment, gap identification, improvement recommendations
+- **A2A Status**: Experimental wrapper around stable Strands agent
+
+## Best Practices for Experimental A2A Implementation
+
+### 1. **Defensive Programming**
+```python
+# Always wrap A2A operations in try-catch blocks
+try:
+    server = A2AServer(agent=agent, host="localhost", port=port)
+    logger.info("✅ A2AServer created successfully")
+except Exception as e:
+    logger.error(f"❌ A2AServer creation failed: {e}")
+    # Implement fallback or graceful degradation
+```
+
+### 2. **Version Pinning**
 ```bash
-# AWS Configuration
-AWS_REGION=us-east-1
-AWS_ACCESS_KEY_ID=...
-AWS_SECRET_ACCESS_KEY=...
-
-# Optional Provider Keys
-OPENAI_API_KEY=...
-NVIDIA_API_KEY=...
-OPENROUTER_API_KEY=...
+# Pin specific versions to avoid breaking changes
+pip install strands-agents==0.2.1 a2a-sdk==0.2.11
 ```
 
-### Monitoring & Observability
-- Process-level logging for each agent
-- A2A protocol message tracing
-- Bedrock API usage monitoring
-- Docker container resource tracking
+### 3. **Comprehensive Logging**
+```python
+# Log all A2A interactions for debugging
+logger.info(f"Sending A2A message to {agent_name}: {message[:100]}...")
+response = await client.send_message(request)
+logger.info(f"Received A2A response from {agent_name}: {len(response_text)} chars")
+```
 
-## Security Considerations
+### 4. **Graceful Degradation**
+```python
+# Implement fallbacks for A2A failures
+try:
+    result = await a2a_communication(agent_url, message)
+except Exception as e:
+    logger.warning(f"A2A failed, using local fallback: {e}")
+    result = local_agent_fallback(message)
+```
 
-### Process Isolation
-- Each agent runs in isolated subprocess
-- No shared memory between processes
-- Docker containers provide additional isolation for tools
+### 5. **Testing Strategy**
+- **Unit Tests**: Test individual agent creation and A2AServer initialization
+- **Integration Tests**: Test A2A communication between agents
+- **Regression Tests**: Verify compatibility after SDK updates
+- **Fallback Tests**: Ensure graceful degradation when A2A fails
 
-### Credential Management
-- AWS credentials via environment variables
-- No hardcoded API keys in source code
-- Secure credential rotation support
+## Evolution Considerations
 
-### Network Security
-- A2A protocol uses localhost communication
-- Docker containers run with minimal privileges
-- No external network access except for required APIs
+### Expected Changes in Future Releases:
+1. **API Modifications**: Method signatures and class interfaces may change
+2. **Protocol Updates**: Message formats and communication patterns may evolve
+3. **Security Enhancements**: Authentication and encryption may become mandatory
+4. **Performance Improvements**: Connection pooling and streaming may be added
 
-## Future Enhancements
+### Migration Strategy:
+1. **Monitor Releases**: Track Strands SDK release notes for A2A changes
+2. **Maintain Compatibility Layers**: Abstract A2A interactions behind interfaces
+3. **Implement Feature Flags**: Allow switching between A2A and fallback modes
+4. **Contribute Feedback**: Report issues and feature requests to help shape development
 
-### Distributed Deployment
-- **Kubernetes**: Deploy agents as separate pods
-- **Service Mesh**: Use Istio for service-to-service communication
-- **Message Queues**: Replace subprocess with distributed messaging
+## File Structure (Current Implementation)
 
-### Advanced Features
-- **Agent Health Monitoring**: Heartbeat and recovery mechanisms
-- **Dynamic Scaling**: Auto-scale agents based on workload
-- **Circuit Breakers**: Prevent cascading failures in multi-agent chains
-- **Distributed Tracing**: Full request tracing across agent boundaries
+```
+src/
+├── research_agent_server.py       # Research specialist A2A server (experimental)
+├── analysis_agent_server.py       # Analysis specialist A2A server (experimental)
+├── factcheck_agent_server.py      # Fact-check specialist A2A server (experimental)
+├── qa_agent_server.py             # QA specialist A2A server (experimental)
+└── orchestrator_client.py         # Multi-agent orchestrator (stable client)
+
+Root Files:
+├── main.py                        # Interactive entry point
+├── start_all_agents.py           # Server management
+├── test_individual_agents.py     # Testing infrastructure
+├── README.md                     # Usage documentation
+└── ARCHITECTURE.md               # This file
+```
+
+## Security Considerations (Production-Ready)
+
+- ✅ **No Hardcoded Credentials**: Uses AWS configuration (`aws configure`)
+- ✅ **Secure Communication**: HTTP-based with proper error handling
+- ✅ **Input Validation**: Proper message format validation
+- ✅ **Resource Management**: Proper connection and resource cleanup
+- ⚠️ **A2A Security**: Limited by experimental status of A2A components
+
+## Performance Characteristics
+
+- **Startup Time**: ~5-10 seconds per agent server
+- **Response Time**: Varies by task complexity (typically 10-60 seconds)
+- **Concurrency**: Each agent can handle multiple concurrent requests
+- **Scalability**: Agents can be deployed on separate machines/containers
+- **Reliability**: Subject to experimental A2A component stability
+
+## Technology Stack
+
+- **Strands Agents SDK 0.2.1**: Core agent framework with experimental A2A support
+- **A2A SDK 0.2.11**: Official Agent-to-Agent protocol implementation (stable)
+- **Amazon Bedrock**: Claude 3.7 Sonnet for LLM capabilities (production)
+- **HTTP/JSON-RPC 2.0**: Transport protocol for agent communication (standard)
+- **Python AsyncIO**: Asynchronous orchestration and communication (stable)
+- **HTTPX**: HTTP client library for A2A communication (stable)
+
+## Key Architectural Benefits and Limitations
+
+### Benefits:
+1. **Standards Compliance**: Follows official A2A protocol specification
+2. **Service Discovery**: Automatic agent discovery via Agent Cards
+3. **Interoperability**: Compatible with other A2A-compliant systems
+4. **Modular Design**: Each agent runs independently
+
+### Limitations (Due to Experimental Status):
+1. **API Instability**: Interfaces may change without notice
+2. **Limited Support**: Experimental features have limited documentation
+3. **Breaking Changes**: Updates may require code modifications
+4. **Production Risk**: Not recommended for critical production systems
+
+## Recommendations for Users
+
+### For Development:
+- ✅ Use for prototyping and experimentation
+- ✅ Implement comprehensive error handling
+- ✅ Pin dependency versions
+- ✅ Maintain fallback mechanisms
+
+### For Production:
+- ⚠️ Use with caution and extensive testing
+- ✅ Implement monitoring and alerting
+- ✅ Have rollback plans ready
+- ✅ Consider alternative patterns for critical systems
+
+---
+
+**Architecture Status**: ⚠️ **Experimental but Functional** - Complete A2A implementation using experimental Strands components with production-ready patterns and defensive programming practices.
+
+**Evolution Note**: This implementation will evolve alongside the Strands Agents SDK. Users should expect periodic updates and potential breaking changes as the A2A support matures from experimental to stable status.

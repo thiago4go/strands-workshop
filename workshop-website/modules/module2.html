@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 2: Custom Tools & MCP Integration - AWS Strands AI Agents Workshop</title>
+    <meta name="description" content="Learn to extend agent capabilities with custom tools and MCP integration">
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="../styles/main.css">
+</head>
+<body data-module="module2">
+    <header>
+        <nav class="main-nav">
+            <div class="container">
+                <div class="logo">
+                    <a href="../index.html">
+                        <h1>AWS Strands Workshop</h1>
+                    </a>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="../setup.html">Setup Guide</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" aria-haspopup="true" aria-expanded="false">Modules</a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="module1.html" role="menuitem">Module 1: Basics</a></li>
+                            <li><a href="module2.html" class="active" role="menuitem" aria-current="page">Module 2: Tools</a></li>
+                            <li><a href="module3.html" role="menuitem">Module 3: Multi-Agent</a></li>
+                            <li><a href="module4.html" role="menuitem">Module 4: Deployment</a></li>
+                            <li><a href="module5.html" role="menuitem">Module 5: Advanced</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="../troubleshooting.html">Troubleshooting</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="module-header">
+            <div class="container">
+                <div class="module-badge">Module 2</div>
+                <h1>Custom Tools & MCP Integration</h1>
+                <div class="module-meta">
+                    <span><i class="icon-clock"></i> 25 minutes</span>
+                    <span><i class="icon-level"></i> Intermediate</span>
+                    <span>Act I: The Enhanced Agent</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="module-navigation">
+            <div class="container">
+                <nav class="module-nav">
+                    <ul>
+                        <li><a href="#learning-objectives">Learning Objectives</a></li>
+                        <li><a href="#prerequisites">Prerequisites</a></li>
+                        <li><a href="#key-concepts">Key Concepts</a></li>
+                        <li><a href="#architecture">Architecture</a></li>
+                        <li><a href="#step-by-step">Step-by-Step</a></li>
+                        <li><a href="#code-examples">Code Examples</a></li>
+                        <li><a href="#mcp-integration">MCP Integration</a></li>
+                        <li><a href="#common-issues">Common Issues</a></li>
+                        <li><a href="#next-steps">Next Steps</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </section>
+
+        <div class="module-content">
+            <div class="container">
+                <div class="module-progress">
+                    <div class="progress-header">
+                        <h3>Your Progress</h3>
+                        <span class="progress-percentage">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-bar-fill"></div>
+                    </div>
+                </div>
+
+                <section id="learning-objectives" class="content-section">
+                    <h2>Learning Objectives</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="objectives-read" class="progress-checkbox" data-module="module2" data-step="objectives">
+                        <label for="objectives-read">Review learning objectives</label>
+                    </div>
+                    <ul>
+                        <li>Create custom tools using the <code>@tool</code> decorator</li>
+                        <li>Integrate built-in Strands tools with custom functionality</li>
+                        <li>Understand the Model Context Protocol (MCP) architecture</li>
+                        <li>Connect agents to external services via MCP integration</li>
+                        <li>Handle MCP client lifecycle and context management</li>
+                        <li>Build production-ready tool-enhanced agents</li>
+                    </ul>
+                </section>
+
+                <section id="prerequisites" class="content-section">
+                    <h2>Prerequisites</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="prerequisites-check" class="progress-checkbox" data-module="module2" data-step="prerequisites">
+                        <label for="prerequisites-check">Verify prerequisites are met</label>
+                    </div>
+                    <ul>
+                        <li>Completed Module 1 (Hello Agent)</li>
+                        <li>Understanding of Python decorators</li>
+                        <li>Node.js installed (for MCP servers)</li>
+                        <li>Basic knowledge of client-server architecture</li>
+                    </ul>
+                    <div class="code-block">
+                        <pre><code># Install MCP servers (required for optional exercise)
+npm install -g @modelcontextprotocol/server-filesystem
+npm install -g @modelcontextprotocol/server-memory</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                </section>
+
+                <section id="key-concepts" class="content-section">
+                    <h2>Key Concepts</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="concepts-review" class="progress-checkbox" data-module="module2" data-step="concepts">
+                        <label for="concepts-review">Review key concepts</label>
+                    </div>
+
+                    <h3>Custom Tools with @tool Decorator</h3>
+                    <p>The <code>@tool</code> decorator transforms Python functions into agent-callable tools:</p>
+                    <div class="code-block">
+                        <pre><code>@tool
+def custom_function(param: str) -> str:
+    """
+    Clear description for LLM tool selection.
+    
+    Args:
+        param (str): Description of parameter
+        
+    Returns:
+        str: Description of return value
+    """
+    return f"Processed: {param}"</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+
+                    <h3>Model Context Protocol (MCP)</h3>
+                    <p>MCP is an open standard that enables AI agents to connect to external tools and services through a unified interface - think "USB-C for AI agents".</p>
+                    
+                    <h4>Before MCP vs With MCP</h4>
+                    <div class="code-block">
+                        <pre><code># ❌ Before MCP: Custom integration for each service
+weather_api = WeatherAPI(api_key="...")
+database = DatabaseConnector(host="...")
+file_system = FileManager(path="...")
+
+# ✅ With MCP: One standard interface for everything
+mcp_client = MCPClient(lambda: stdio_client(...))
+with mcp_client:
+    tools = mcp_client.list_tools_sync()  # Auto-discover all capabilities
+    agent = Agent(tools=tools)  # Ready to use!</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                </section>
+
+                <section id="architecture" class="content-section">
+                    <h2>Architecture Overview</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="architecture-review" class="progress-checkbox" data-module="module2" data-step="architecture">
+                        <label for="architecture-review">Review architecture diagram</label>
+                    </div>
+                    
+                    <div class="architecture-diagram">
+                        <h3>Tool Integration Architecture</h3>
+                        <div class="diagram-container">
+                            <pre class="mermaid-diagram">
+graph TB
+    User[👤 User Input] --> Agent[🤖 Enhanced Agent]
+    Agent --> BuiltinTools[📦 Built-in Tools<br/>calculator, current_time]
+    Agent --> CustomTools[🛠️ Custom Tools<br/>@tool decorated functions]
+    Agent --> MCPTools[🌐 MCP Tools<br/>External integrations]
+    
+    BuiltinTools --> ToolExecution[⚙️ Tool Execution]
+    CustomTools --> ToolExecution
+    MCPTools --> ToolExecution
+    
+    MCPTools --> FilesystemServer[📁 Filesystem Server<br/>@modelcontextprotocol/server-filesystem]
+    MCPTools --> MemoryServer[🧠 Memory Server<br/>@modelcontextprotocol/server-memory]
+    
+    FilesystemServer --> NodeJS1[🟢 Node.js Process]
+    MemoryServer --> NodeJS2[🟢 Node.js Process]
+    
+    ToolExecution --> BedrockModel[🧠 Bedrock Model<br/>Claude 3.7 Sonnet]
+    BedrockModel --> AWSBedrock[☁️ AWS Bedrock]
+    AWSBedrock --> Response[📄 Enhanced Response]
+            </pre>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="step-by-step" class="content-section">
+                    <h2>Step-by-Step Instructions</h2>
+
+                    <div class="step-item">
+                        <div class="step-checkbox">
+                            <input type="checkbox" id="step-2-1" class="progress-checkbox" data-module="module2" data-step="1">
+                            <label for="step-2-1"><strong>Step 1: Create Custom Tools</strong></label>
+                        </div>
+                        <div class="step-content">
+                            <p>Create <code>exercise2-custom-tools.py</code> with custom tool definitions:</p>
+                            <div class="code-block">
+                                <pre><code>from strands import Agent, tool
+from strands_tools import calculator, current_time
+
+@tool
+def letter_counter(word: str, letter: str) -> int:
+    """
+    Count occurrences of a specific letter in a word.
+    
+    Args:
+        word (str): The input word to search in
+        letter (str): The specific letter to count
+        
+    Returns:
+        int: The number of occurrences of the letter in the word
+    """
+    # Input validation
+    if not isinstance(word, str) or not isinstance(letter, str):
+        return 0
+    if len(letter) != 1:
+        raise ValueError("The 'letter' parameter must be a single character")
+    
+    return word.lower().count(letter.lower())
+
+@tool
+def text_reverser(text: str) -> str:
+    """
+    Reverse the order of characters in text.
+    
+    Args:
+        text (str): Text to reverse
+        
+    Returns:
+        str: Reversed text
+    """
+    if not isinstance(text, str):
+        return "Error: Input must be a string"
+    
+    return text[::-1]</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <div class="step-checkbox">
+                            <input type="checkbox" id="step-2-2" class="progress-checkbox" data-module="module2" data-step="2">
+                            <label for="step-2-2"><strong>Step 2: Create Enhanced Agent</strong></label>
+                        </div>
+                        <div class="step-content">
+                            <p>Combine built-in and custom tools in a single agent:</p>
+                            <div class="code-block">
+                                <pre><code># Create agent with both built-in and custom tools
+agent = Agent(tools=[
+    calculator,           # Built-in tool
+    current_time,        # Built-in tool
+    letter_counter,      # Custom tool
+    text_reverser,       # Custom tool
+])
+
+# Show available tools
+print("Available tools:")
+for tool_name in agent.tool_names:
+    print(f"  • {tool_name}")</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <div class="step-checkbox">
+                            <input type="checkbox" id="step-2-3" class="progress-checkbox" data-module="module2" data-step="3">
+                            <label for="step-2-3"><strong>Step 3: Test Tool Integration</strong></label>
+                        </div>
+                        <div class="step-content">
+                            <p>Test the agent with various tool scenarios:</p>
+                            <div class="code-block">
+                                <pre><code>test_requests = [
+    "What time is it right now, in Sydney?",
+    "Calculate 15 * 23 + 47",
+    "How many letter 'r's are in the word 'strawberry'?",
+    "Reverse the text 'Hello World'",
+]
+
+for i, request in enumerate(test_requests, 1):
+    print(f"\n{i}. 📝 Request: {request}")
+    try:
+        response = agent(request)
+        print(f"   🤖 Response: {response}")
+    except Exception as e:
+        print(f"   ❌ Error: {e}")</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <div class="step-checkbox">
+                            <input type="checkbox" id="step-2-4" class="progress-checkbox" data-module="module2" data-step="4">
+                            <label for="step-2-4"><strong>Step 4: Run the Exercise</strong></label>
+                        </div>
+                        <div class="step-content">
+                            <p>Execute the complete custom tools exercise:</p>
+                            <div class="code-block">
+                                <pre><code>python exercise2-custom-tools.py</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                            <p><strong>Expected Output:</strong></p>
+                            <div class="code-block">
+                                <pre><code>🛠️  Custom Tools Demo
+==================================================
+Available tools:
+  • calculator
+  • current_time
+  • letter_counter
+  • text_reverser
+
+🧪 Testing 4 different tool scenarios:
+==================================================
+
+1. 📝 Request: What time is it right now, in Sydney?
+   🤖 Response: The current time in Sydney is...</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="code-examples" class="content-section">
+                    <h2>Advanced Code Examples</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="code-examples-review" class="progress-checkbox" data-module="module2" data-step="examples">
+                        <label for="code-examples-review">Review advanced examples</label>
+                    </div>
+
+                    <h3>Tool Best Practices</h3>
+                    <div class="code-block">
+                        <pre><code>@tool
+def word_counter(text: str) -> int:
+    """
+    Count the number of words in text.
+    
+    Args:
+        text (str): Text to count words in
+        
+    Returns:
+        int: Number of words
+    """
+    # Input validation
+    if not isinstance(text, str):
+        return 0
+    
+    # Handle edge cases
+    if not text.strip():
+        return 0
+    
+    # Core functionality
+    words = text.strip().split()
+    return len(words)</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+
+                    <h3>Interactive Mode Implementation</h3>
+                    <div class="code-block">
+                        <pre><code>print("🎮 Interactive Mode - Try your own questions!")
+print("Available capabilities:")
+print("  • Mathematical calculations")
+print("  • Current time")
+print("  • Letter counting in words")
+print("  • Text reversal")
+print("\nType 'quit' to exit")
+
+while True:
+    try:
+        user_input = input("\n💬 You: ").strip()
+        
+        if user_input.lower() in ['quit', 'exit', 'q']:
+            print("👋 Goodbye!")
+            break
+        
+        if not user_input:
+            continue
+            
+        response = agent(user_input)
+        print(f"🤖 Agent: {response}")
+        
+    except KeyboardInterrupt:
+        print("\n👋 Goodbye!")
+        break
+    except Exception as e:
+        print(f"❌ Error: {e}")</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                </section>
+
+                <section id="mcp-integration" class="content-section">
+                    <h2>MCP Integration (Optional Advanced Exercise)</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="mcp-integration-review" class="progress-checkbox" data-module="module2" data-step="mcp">
+                        <label for="mcp-integration-review">Review MCP integration</label>
+                    </div>
+
+                    <h3>Critical MCP Pattern: Context Manager Usage</h3>
+                    <p>The most important concept in MCP integration is proper context manager usage:</p>
+                    
+                    <div class="code-block">
+                        <pre><code># ❌ WRONG WAY (causes MCPClientInitializationError):
+client = MCPClient(...)
+tools = client.list_tools_sync()  # Outside context manager
+agent = Agent(tools=tools)        # Outside context manager
+with client:
+    response = agent("task")       # Agent created outside, used inside
+
+# ✅ CORRECT WAY (works properly):
+client = MCPClient(...)
+with client:                      # Context manager first
+    tools = client.list_tools_sync()  # Inside context manager
+    agent = Agent(tools=tools)        # Inside context manager
+    response = agent("task")           # Everything inside</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+
+                    <h3>MCP Filesystem Integration</h3>
+                    <div class="code-block">
+                        <pre><code>from mcp import stdio_client, StdioServerParameters
+from strands.tools.mcp import MCPClient
+from pathlib import Path
+
+# Create MCPClient for filesystem server
+current_dir = str(Path.cwd())
+client = MCPClient(lambda: stdio_client(
+    StdioServerParameters(
+        command="npx",
+        args=["-y", "@modelcontextprotocol/server-filesystem", current_dir]
+    )
+))
+
+# CRITICAL: Use agent WITHIN the client context manager
+with client:
+    # Get tools and create agent INSIDE the context manager
+    tools = client.list_tools_sync()
+    
+    agent = Agent(
+        model=BedrockModel(
+            model_id="us.anthropic.claude-3-7-sonnet-20250219-v1:0",
+            temperature=0.3
+        ),
+        tools=tools,
+        system_prompt="You are a filesystem assistant with file operation capabilities."
+    )
+    
+    # Now you can use the agent with MCP tools
+    response = agent("List all .py files in the current directory")
+    print(response)</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+
+                    <h3>MCP Memory Integration</h3>
+                    <div class="code-block">
+                        <pre><code># Memory server for persistent storage
+client = MCPClient(lambda: stdio_client(
+    StdioServerParameters(
+        command="npx",
+        args=["-y", "@modelcontextprotocol/server-memory"]
+    )
+))
+
+with client:
+    tools = client.list_tools_sync()
+    
+    agent = Agent(
+        model=BedrockModel(
+            model_id="us.anthropic.claude-3-7-sonnet-20250219-v1:0",
+            temperature=0.3
+        ),
+        tools=tools,
+        system_prompt="You are a memory-enhanced assistant with persistent storage capabilities."
+    )
+    
+    # Store and retrieve information
+    agent("Remember that I am learning about MCP integration")
+    response = agent("What do you remember about me?")
+    print(response)</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+
+                    <h3>Running the MCP Exercise</h3>
+                    <div class="code-block">
+                        <pre><code># Check setup
+python optional-module2-mcp-integration.py --check
+
+# See setup instructions
+python optional-module2-mcp-integration.py --setup
+
+# Run specific exercises
+python optional-module2-mcp-integration.py --exercise 1  # File operations
+python optional-module2-mcp-integration.py --exercise 2  # Memory operations
+python optional-module2-mcp-integration.py --exercise 3  # Custom workflow</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                </section>
+
+                <section id="common-issues" class="content-section">
+                    <h2>Common Issues & Solutions</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="common-issues-review" class="progress-checkbox" data-module="module2" data-step="issues">
+                        <label for="common-issues-review">Review common issues</label>
+                    </div>
+
+                    <h3>Issue: Tool Not Being Called</h3>
+                    <div class="code-block">
+                        <pre><code>Agent doesn't use custom tool when expected</code></pre>
+                    </div>
+                    <p><strong>Solution:</strong> Improve tool docstring and type hints:</p>
+                    <div class="code-block">
+                        <pre><code>@tool
+def better_tool(input_text: str) -> str:
+    """
+    CLEAR, SPECIFIC description of what this tool does.
+    Be explicit about when the LLM should use this tool.
+    
+    Args:
+        input_text (str): Detailed description of expected input
+        
+    Returns:
+        str: Detailed description of what gets returned
+    """
+    return process_input(input_text)</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+
+                    <h3>Issue: MCPClientInitializationError</h3>
+                    <div class="code-block">
+                        <pre><code>MCPClientInitializationError: Agent created outside context manager</code></pre>
+                    </div>
+                    <p><strong>Solution:</strong> Always create agents inside the MCP context manager:</p>
+                    <div class="code-block">
+                        <pre><code># ✅ CORRECT pattern
+with mcp_client:
+    tools = mcp_client.list_tools_sync()
+    agent = Agent(tools=tools)  # Create agent inside context
+    response = agent("task")</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+
+                    <h3>Issue: MCP Server Not Found</h3>
+                    <div class="code-block">
+                        <pre><code>Error: MCP server not working</code></pre>
+                    </div>
+                    <p><strong>Solution:</strong> Install MCP servers globally:</p>
+                    <div class="code-block">
+                        <pre><code># Install Node.js first, then:
+npm install -g @modelcontextprotocol/server-filesystem
+npm install -g @modelcontextprotocol/server-memory
+
+# Verify installation
+npx @modelcontextprotocol/server-filesystem --help</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+
+                    <h3>Issue: Tool Parameter Validation</h3>
+                    <div class="code-block">
+                        <pre><code>TypeError: Tool received unexpected parameter type</code></pre>
+                    </div>
+                    <p><strong>Solution:</strong> Add comprehensive input validation:</p>
+                    <div class="code-block">
+                        <pre><code>@tool
+def safe_tool(input_data: str) -> str:
+    """Tool with comprehensive error handling."""
+    try:
+        # Input validation
+        if not isinstance(input_data, str):
+            return "Error: Input must be a string"
+        
+        if not input_data.strip():
+            return "Error: Input cannot be empty"
+        
+        # Tool logic
+        result = process_data(input_data)
+        return result
+        
+    except ValueError as e:
+        return f"Input validation error: {e}"
+    except Exception as e:
+        return f"Tool execution error: {e}"</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                </section>
+
+                <section id="next-steps" class="content-section">
+                    <h2>Next Steps</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="next-steps-review" class="progress-checkbox" data-module="module2" data-step="next">
+                        <label for="next-steps-review">Review next steps</label>
+                    </div>
+                    <p>In Module 3, you'll learn to:</p>
+                    <ul>
+                        <li>Implement multi-agent coordination patterns</li>
+                        <li>Use the agents-as-tools pattern</li>
+                        <li>Build specialist agents that work together</li>
+                        <li>Handle complex research workflows</li>
+                        <li>Coordinate multiple agents with MCP integration</li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+
+        <section class="key-takeaways">
+            <div class="container">
+                <h2>Key Takeaways</h2>
+                <ul>
+                    <li>✅ <strong>Custom tools extend agent capabilities</strong> - Use <code>@tool</code> decorator</li>
+                    <li>✅ <strong>MCP provides unified external integration</strong> - One protocol for all services</li>
+                    <li>✅ <strong>Context manager usage is critical</strong> - Create agents inside MCP contexts</li>
+                    <li>✅ <strong>Tool documentation drives selection</strong> - Clear docstrings are essential</li>
+                    <li>✅ <strong>Input validation prevents errors</strong> - Always validate tool parameters</li>
+                </ul>
+                <div class="module-metadata">
+                    <p><strong>Time to Complete:</strong> 25 minutes</p>
+                    <p><strong>Difficulty:</strong> Intermediate</p>
+                    <p><strong>Prerequisites Met:</strong> ✅ Ready for Module 3</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="next-module">
+            <div class="container">
+                <h2>Continue Your Journey</h2>
+                <p>Excellent work! You've mastered custom tools and MCP integration. Ready for multi-agent coordination?</p>
+                <div class="module-nav-buttons">
+                    <a href="module1.html" class="btn btn-secondary">← Previous: Module 1</a>
+                    <a href="module3.html" class="btn btn-primary">Continue to Module 3: Multi-Agent →</a>
+                </div>
+                <a href="../troubleshooting.html" class="btn btn-secondary">Need Help?</a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h2>AWS Strands Workshop</h2>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="../index.html">Home</a></li>
+                        <li><a href="../setup.html">Setup Guide</a></li>
+                        <li><a href="module2.html">Module 2: Tools</a></li>
+                        <li><a href="../troubleshooting.html">Troubleshooting</a></li>
+                    </ul>
+                </div>
+                <div class="footer-resources">
+                    <h3>Additional Resources</h3>
+                    <ul>
+                        <li><a href="https://strandsagents.com/" target="_blank" rel="noopener noreferrer">AWS Strands SDK Documentation</a></li>
+                        <li><a href="https://docs.aws.amazon.com/bedrock/" target="_blank" rel="noopener noreferrer">Amazon Bedrock User Guide</a></li>
+                        <li><a href="https://modelcontextprotocol.io/" target="_blank" rel="noopener noreferrer">Model Context Protocol (MCP) Documentation</a></li>
+                        <li><a href="https://github.com/a2aproject/A2A" target="_blank" rel="noopener noreferrer">A2A Protocol Documentation</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 AWS Strands Workshop. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Prism.js for syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+    
+    <!-- Diagram Renderer for Interactive Visualizations -->
+    <script src="../scripts/diagram-renderer.js"></script>
+    
+    <!-- Main JavaScript functionality -->
+    <script src="../scripts/main.js"></script>
+</body>
+</html>

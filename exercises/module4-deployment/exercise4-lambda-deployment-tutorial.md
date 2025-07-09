@@ -1,466 +1,153 @@
-# Deploying Strands SDK Agents on AWS Lambda: A Beginner's Guide
+# Module 4: Deploying Strands Agents to AWS Lambda
 
-This tutorial will guide you through deploying Strands SDK agents to AWS Lambda. We'll cover deploying a simple "Hello Agent" and an agent with custom tools, focusing on a beginner-friendly approach.
+## 🎯 Learning Objectives
 
-## Why AWS Lambda for Strands Agents?
+By the end of this module, you will be able to:
+- Deploy a Strands agent with custom tools to AWS Lambda
+- Configure proper IAM permissions for Bedrock access
+- Test your deployed Lambda function
+- Understand serverless deployment patterns for AI agents
 
-AWS Lambda is a serverless compute service that lets you run code without provisioning or managing servers. This is ideal for Strands agents because:
+## 📋 Prerequisites
 
-*   **Scalability:** Lambda automatically scales your agent to handle varying loads.
-*   **Cost-effectiveness:** You only pay for the compute time your agent consumes.
-*   **Ease of Integration:** Lambda integrates seamlessly with other AWS services like API Gateway, which can expose your agent as a web API.
+- AWS CLI configured with your credentials (`aws configure`)
+- Python 3.10+ installed
+- Completed Module 2 (Custom Tools)
+- AWS account with Bedrock access enabled
 
-## Prerequisites
+## 🏗️ What We're Deploying
 
-Before you begin, ensure you have the following:
+We'll deploy your `exercise2-custom-tools.py` agent to AWS Lambda. This agent includes:
+- **Built-in tools**: calculator, current_time
+- **Custom tools**: letter_counter, text_reverser, word_counter
+- **Bedrock integration**: Uses Claude 3.7 Sonnet
 
-1.  **An AWS Account:** If you don't have one, you can sign up for a free tier account.
-2.  **AWS CLI Configured:** Ensure your AWS Command Line Interface (CLI) is installed and configured with appropriate credentials and a default region.
-3.  **Python 3.8+:** Lambda supports various Python runtimes.
-4.  **Basic Understanding of Python:** This tutorial assumes familiarity with Python.
-5.  **Basic Understanding of AWS Lambda:** Familiarity with Lambda concepts will be helpful but is not strictly required.
+## 📁 Step 1: Create Lambda Handler
 
-## Understanding the Agent Code
+First, we need to convert your agent to work with AWS Lambda's event-driven model.
 
-We will be deploying two types of agents:
+Create a new file called `lambda_handler.py` (see the code file in this directory)
 
-*   **Simple Agent:** From `/home/thiago/agentic-era/on-agents/agents-workspace/strands-workshop/exercises/module1-basics/exercise1-hello-agent.py`
-*   **Agent with Custom Tools:** From `/home/thiago/agentic-era/on-agents/agents-workspace/strands-workshop/exercises/module2-tools/exercise2-custom-tools.py`
+**Key changes from your original agent:**
+- Added `lambda_handler(event, context)` function - this is what Lambda calls
+- Extract the prompt from the Lambda event object
+- Return a proper HTTP response with status code and JSON body
+- Added error handling for production use
 
-Since AWS Lambda is not ideal for hosting MCP servers (which are long-running processes), we will focus on agents that either use built-in Strands tools or custom tools that do not require a separate MCP server.
+## 📦 Step 2: Create Requirements File
 
----
+Create `requirements.txt` (see the file in this directory)
 
-## Step 1: Deploying a Simple "Hello Agent"
+This tells Lambda what Python packages to install.
 
-First, let's deploy a basic Strands agent that simply responds to a greeting.
+## 🔐 Step 3: Create IAM Policy for Bedrock
 
-### 1.1. Prepare the Agent Code
+The `bedrock-policy.json` file (already in this directory) defines what AWS services your Lambda can access.
 
-We'll use the `exercise1-hello-agent.py` as our base. We need to adapt it slightly to be a Lambda handler.
+**Key permissions:**
+- `bedrock:InvokeModel` - Call Bedrock models
+- `bedrock:InvokeModelWithResponseStream` - Stream responses
+- Covers all Claude model variants
 
-**Original `exercise1-hello-agent.py` (simplified for context):**
+## 🚀 Step 4: Deploy Your Agent
 
-```python
-from strands import Agent
-from strands.models import BedrockModel # Assuming Bedrock is configured
+Use the `deploy.py` script (see the file in this directory) to automate deployment.
 
-# Initialize the Bedrock model
-model = BedrockModel(
-    model_id="us.anthropic.claude-3-7-sonnet-20250219-v1:0",
-    temperature=0.3
-)
+**What the deployment script does:**
+1. **Package Dependencies** - Downloads all Python packages for Lambda
+2. **Create IAM Role** - Sets up permissions for your function
+3. **Deploy Function** - Uploads your code to Lambda
+4. **Test Function** - Runs a quick test to verify it works
 
-# Create a simple agent
-hello_agent = Agent(
-    name="HelloAgent",
-    model=model,
-    system_prompt="You are a friendly AI assistant that greets users."
-)
-
-if __name__ == "__main__":
-    response = hello_agent("Hello there!")
-    print(response)
-```
-
-**Create `lambda_handler_hello.py`:**
-
-We'll create a new file that acts as the Lambda function's entry point. This file will contain the `handler` function that Lambda invokes.
-
-```python
-import json
-from strands import Agent
-from strands.models import BedrockModel # Assuming Bedrock is configured
-
-# Initialize the Bedrock model outside the handler for warm starts
-# This ensures the model is loaded only once per Lambda instance
-model = BedrockModel(
-    model_id="us.anthropic.claude-3-7-sonnet-20250219-v1:0",
-    temperature=0.3
-    region="us-east-1"  # Adjust region as needed
-)
-
-# Create the agent outside the handler for warm starts
-hello_agent = Agent(
-    name="HelloAgent",
-    model=model,
-    system_prompt="You are a friendly AI assistant that greets users."
-)
-
-def handler(event, context):
-    # Extract the prompt from the Lambda event
-    # Assuming the event payload is JSON with a 'prompt' key
-    try:
-        body = json.loads(event.get('body', '{}'))
-        user_prompt = body.get('prompt', 'Hello!')
-    except json.JSONDecodeError:
-        user_prompt = event.get('prompt', 'Hello!') # Fallback for non-JSON or direct invocation
-
-    # Invoke the Strands agent
-    response = hello_agent(user_prompt)
-
-    # Return the response in a format API Gateway can understand
-    return {
-        'statusCode': 200,
-        'headers': {
-            'Content-Type': 'application/json'
-        },
-        'body': json.dumps({
-            'response': str(response)
-        })
-    }
-```
-
-Save this content to a new file: `/home/thiago/agentic-era/on-agents/agents-workspace/strands-workshop/exercises/module4-deployment/lambda_handler_hello.py`
-
-### 1.2. Package the Lambda Function
-
-AWS Lambda requires your code and its dependencies to be packaged into a `.zip` file.
-
-**a. Create `requirements.txt`:**
-
-First, create a `requirements.txt` file in the same directory as your `lambda_handler_hello.py` file. This file lists all the Python packages your Lambda function depends on.
-
-```
-strands
-boto3 # AWS SDK for Python, often useful in Lambda
-```
-
-**b. Install Dependencies and Create Deployment Package:**
-
-You'll need to install these dependencies into a directory and then zip everything together.
-
+### Run Deployment
 ```bash
-# Create a directory for your deployment package
-mkdir package
-
-# Install dependencies into the 'package' directory
-# Use --platform manylinux2014_x86_64 if your Lambda architecture is x86_64
-# Use --platform manylinux2014_aarch64 if your Lambda architecture is arm64 (Graviton)
-# For simplicity, we'll assume x86_64 for now.
-pip install -r requirements.txt --target package/
-
-# Copy your Lambda handler file into the package directory
-cp lambda_handler_hello.py package/
-
-# Navigate into the package directory
-cd package/
-
-# Zip all contents of the package directory
-zip -r ../hello_agent_lambda.zip .
-
-# Navigate back to the parent directory
-cd ..
+python3 deploy.py
 ```
 
-After these steps, you should have a `hello_agent_lambda.zip` file in your `module4-deployment` directory. This is your deployment package.
+The script will:
+- ✅ Create a deployment package with all dependencies
+- ✅ Create IAM role with proper permissions
+- ✅ Deploy your agent to Lambda
+- ✅ Run a test to verify everything works
 
----
+## 🧪 Step 5: Test Your Deployed Agent
 
-### 1.3. Create the Lambda Function in AWS
+Use the `test_lambda.py` script (see the file in this directory) for easy testing.
 
-Now, let's create the Lambda function using the AWS CLI.
-
-**a. Create an IAM Role for Lambda:**
-
-Your Lambda function needs permissions to execute and to interact with other AWS services (like Bedrock for the Strands agent).
-
+### Run Tests
 ```bash
-# Create a trust policy for Lambda
-cat << EOF > lambda-trust-policy.json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "lambda.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-EOF
+# Run all predefined test cases
+python3 test_lambda.py
 
-# Create the IAM role
-aws iam create-role --role-name StrandsHelloAgentLambdaRole --assume-role-policy-document file://lambda-trust-policy.json
-
-# Attach the AWSLambdaBasicExecutionRole policy (for CloudWatch Logs)
-aws iam attach-role-policy --role-name StrandsHelloAgentLambdaRole --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-
-# Attach a policy for Bedrock access (if using BedrockModel)
-# You might need to create a custom policy with bedrock:InvokeModel permissions
-aws iam attach-role-policy --role-name StrandsHelloAgentLambdaRole --policy-arn arn:aws:iam::aws:policy/AmazonBedrockFullAccess # Use a more restrictive policy in production!
-
-# Get the ARN of the created role (you'll need this for the next step)
-LAMBDA_ROLE_ARN=$(aws iam get-role --role-name StrandsHelloAgentLambdaRole --query 'Role.Arn' --output text)
-echo "Lambda Role ARN: $LAMBDA_ROLE_ARN"
+# Test with custom prompt
+python3 test_lambda.py "Calculate the square root of 144 and reverse the word 'lambda'"
 ```
 
-**b. Create the Lambda Function:**
-
-```bash
-aws lambda create-function \
-    --function-name StrandsHelloAgent \
-    --runtime python3.10 \
-    --role "$LAMBDA_ROLE_ARN" \
-    --handler lambda_handler_hello.handler \
-    --zip-file fileb://hello_agent_lambda.zip \
-    --memory 1024 \
-    --timeout 30 \
-    --environment Variables="{MODEL_ID=us.anthropic.claude-3-7-sonnet-20250219-v1:0,TEMPERATURE=0.3}" # Example for Bedrock
-```
-
-*   `--function-name`: A unique name for your Lambda function.
-*   `--runtime`: The Python runtime version.
-*   `--role`: The ARN of the IAM role you created.
-*   `--handler`: The file and function name (e.g., `your_file_name.your_function_name`).
-*   `--zip-file`: The path to your deployment package.
-*   `--memory`: Memory allocated to the function (1024 MB is a good starting point for LLM agents).
-*   `--timeout`: Maximum execution time (30 seconds is common for API Gateway, adjust as needed).
-*   `--environment`: Environment variables for your agent (e.g., Bedrock model ID, temperature).
-
----
-
-### 1.4. Test the Deployed Agent
-
-Once the Lambda function is created, you can test it directly using the AWS CLI.
-
+### Manual Testing
 ```bash
 aws lambda invoke \
-    --function-name StrandsHelloAgent \
-    --payload '{"body": "{\"prompt\": \"Hello Lambda Agent!\"}"}' \
-    output.json
-
-# View the output
-cat output.json
+  --function-name custom-tools-agent \
+  --cli-binary-format raw-in-base64-out \
+  --payload '{"prompt": "What tools do you have?"}' \
+  --region us-east-1 \
+  output.json && cat output.json
 ```
 
-You should see a `output.json` file created with the response from your Lambda function. Check the contents of `output.json` to verify the agent's response.
+## 🔧 Troubleshooting
 
----
+### Common Issues and Solutions
 
-## Step 2: Deploying an Agent with Custom Tools
+**1. "ModuleNotFoundError" in Lambda**
+- Re-run the deployment script to ensure all dependencies are included
 
-Now, let's deploy a Strands agent that utilizes a custom tool. We'll use the `exercise2-custom-tools.py` as our base, which demonstrates a simple custom tool.
+**2. "AccessDeniedException" for Bedrock**
+- Check that Claude 3.7 Sonnet is enabled in your AWS Bedrock console
+- Verify the IAM role has the correct permissions
 
-### 2.1. Prepare the Agent Code with Custom Tools
+**3. "Function not found" error**
+- Check the function name and region in your test commands
 
-We need to adapt `exercise2-custom-tools.py` to be a Lambda handler, similar to what we did for the "Hello Agent".
+**4. Timeout errors**
+- The function timeout is set to 60 seconds, which should be sufficient
 
-**Original `exercise2-custom-tools.py` (simplified for context):**
-
-```python
-from strands import Agent, tool
-from strands.models import BedrockModel
-
-# Define a simple custom tool
-@tool
-def multiply(a: int, b: int) -> int:
-    """Multiplies two integers and returns the result."""
-    return a * b
-
-# Initialize the Bedrock model
-model = BedrockModel(
-    model_id="us.anthropic.claude-3-7-sonnet-20250219-v1:0",
-    temperature=0.3
-)
-
-# Create an agent with the custom tool
-math_agent = Agent(
-    name="MathAgent",
-    model=model,
-    system_prompt="You are a helpful math assistant. Use the 'multiply' tool for multiplication.",
-    tools=[multiply]
-)
-
-if __name__ == "__main__":
-    response = math_agent("What is 5 multiplied by 7?")
-    print(response)
-```
-
-**Create `lambda_handler_custom_tool.py`:**
-
-This file will contain the `handler` function for our custom tool agent.
-
-```python
-import json
-from strands import Agent, tool
-from strands.models import BedrockModel
-
-# Define the custom tool within the Lambda handler file
-@tool
-def multiply(a: int, b: int) -> int:
-    """Multiplies two integers and returns the result."""
-    return a * b
-
-# Initialize the Bedrock model outside the handler for warm starts
-model = BedrockModel(
-    model_id="us.anthropic.claude-3-7-sonnet-20250219-v1:0",
-    temperature=0.3
-)
-
-# Create the agent with the custom tool outside the handler for warm starts
-math_agent = Agent(
-    name="MathAgent",
-    model=model,
-    system_prompt="You are a helpful math assistant. Use the 'multiply' tool for multiplication.",
-    tools=[multiply]
-)
-
-def handler(event, context):
-    try:
-        body = json.loads(event.get('body', '{}'))
-        user_prompt = body.get('prompt', 'What is 2 multiplied by 3?')
-    except json.JSONDecodeError:
-        user_prompt = event.get('prompt', 'What is 2 multiplied by 3?')
-
-    response = math_agent(user_prompt)
-
-    return {
-        'statusCode': 200,
-        'headers': {
-            'Content-Type': 'application/json'
-        },
-        'body': json.dumps({
-            'response': str(response)
-        })
-    }
-```
-
-Save this content to a new file: `/home/thiago/agentic-era/on-agents/agents-workspace/strands-workshop/exercises/module4-deployment/lambda_handler_custom_tool.py`
-
-### 2.2. Package the Lambda Function with Custom Tools
-
-The packaging process is very similar to the "Hello Agent", but we'll use the new handler file.
-
-**a. Create `requirements.txt`:**
-
-The `requirements.txt` will be the same as before, as the core dependencies (`strands`, `boto3`) are sufficient.
-
-```
-strands
-boto3
-```
-
-**b. Install Dependencies and Create Deployment Package:**
-
+### Verification Commands
 ```bash
-# Create a new directory for your custom tool agent deployment package
-mkdir package_custom_tool
+# Check if function exists
+aws lambda get-function --function-name custom-tools-agent --region us-east-1
 
-# Install dependencies into the 'package_custom_tool' directory
-pip install -r requirements.txt --target package_custom_tool/
-
-# Copy your Lambda handler file into the package directory
-cp lambda_handler_custom_tool.py package_custom_tool/
-
-# Navigate into the package directory
-cd package_custom_tool/
-
-# Zip all contents of the package directory
-zip -r ../custom_tool_agent_lambda.zip .
-
-# Navigate back to the parent directory
-cd ..
-```
-
-After these steps, you should have a `custom_tool_agent_lambda.zip` file in your `module4-deployment` directory. This is your deployment package.
-
----
-
-### 2.3. Create the Lambda Function in AWS
-
-Now, let's create the Lambda function for the custom tool agent using the AWS CLI. You can reuse the `StrandsHelloAgentLambdaRole` IAM role created earlier, as it already has the necessary permissions for Bedrock access.
-
-```bash
-# Get the ARN of the existing role
-LAMBDA_ROLE_ARN=$(aws iam get-role --role-name StrandsHelloAgentLambdaRole --query 'Role.Arn' --output text)
-echo "Lambda Role ARN: $LAMBDA_ROLE_ARN"
-
-# Create the Lambda function
-aws lambda create-function \
-    --function-name StrandsCustomToolAgent \
-    --runtime python3.10 \
-    --role "$LAMBDA_ROLE_ARN" \
-    --handler lambda_handler_custom_tool.handler \
-    --zip-file fileb://custom_tool_agent_lambda.zip \
-    --memory 1024 \
-    --timeout 30 \
-    --environment Variables="{MODEL_ID=us.anthropic.claude-3-7-sonnet-20250219-v1:0,TEMPERATURE=0.3}" # Example for Bedrock
-```
-
----
-
-### 2.4. Test the Deployed Agent with Custom Tools
-
-Once the Lambda function is created, test it directly using the AWS CLI.
-
-```bash
+# Manual test
 aws lambda invoke \
-    --function-name StrandsCustomToolAgent \
-    --payload '{"body": "{\"prompt\": \"What is 12 multiplied by 9?\"}"}' \
-    output_custom_tool.json
-
-# View the output
-cat output_custom_tool.json
+  --function-name custom-tools-agent \
+  --cli-binary-format raw-in-base64-out \
+  --payload '{"prompt": "What tools do you have?"}' \
+  --region us-east-1 \
+  output.json && cat output.json
 ```
 
-You should see a `output_custom_tool.json` file created with the response from your Lambda function. Verify that the agent correctly used the `multiply` tool to answer the question.
+## 🎉 Success Criteria
+
+Your deployment is successful when:
+- ✅ Lambda function is created without errors
+- ✅ Test cases run successfully
+- ✅ Agent responds with tool usage (calculations, time, text operations)
+- ✅ All custom tools are available and working
+
+## 🚀 Next Steps
+
+Once deployed, you can:
+1. **Add API Gateway** to create HTTP endpoints
+2. **Monitor with CloudWatch** for performance metrics
+3. **Scale to multi-agent systems** (Module 3)
+4. **Implement streaming responses** for real-time interaction
+
+## 📚 Key Concepts Learned
+
+- **Serverless Architecture**: No server management required
+- **Event-Driven Processing**: Lambda responds to events/requests
+- **IAM Security**: Proper permissions for AWS services
+- **Dependency Management**: Packaging Python dependencies for Lambda
+- **Tool Integration**: Custom tools work seamlessly in serverless environment
 
 ---
 
-## Step 3: Cleanup
-
-To avoid incurring unnecessary AWS charges, it's important to clean up the resources you've created.
-
-### 3.1. Delete the Lambda Functions
-
-```bash
-aws lambda delete-function --function-name StrandsHelloAgent
-aws lambda delete-function --function-name StrandsCustomToolAgent
-```
-
-### 3.2. Detach Policies and Delete the IAM Role
-
-```bash
-# Detach policies
-aws iam detach-role-policy --role-name StrandsHelloAgentLambdaRole --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-aws iam detach-role-policy --role-name StrandsHelloAgentLambdaRole --policy-arn arn:aws:iam::aws:policy/AmazonBedrockFullAccess
-
-# Delete the role
-aws iam delete-role --role-name StrandsHelloAgentLambdaRole
-```
-
-### 3.3. Remove Local Files
-
-```bash
-rm -rf package/
-rm -rf package_custom_tool/
-rm hello_agent_lambda.zip
-rm custom_tool_agent_lambda.zip
-rm lambda_handler_hello.py
-rm lambda_handler_custom_tool.py
-rm requirements.txt
-rm lambda-trust-policy.json
-rm output.json
-rm output_custom_tool.json
-```
-
----
-
-## Conclusion
-
-Congratulations! You have successfully learned how to deploy Strands SDK agents to AWS Lambda. You've deployed both a simple "Hello Agent" and an agent with a custom tool, understanding the key steps involved in preparing your code, packaging dependencies, creating IAM roles, and deploying Lambda functions using the AWS CLI.
-
-This tutorial focused on agents that do not require a separate MCP server, as Lambda's ephemeral nature makes long-running MCP servers challenging. For more complex scenarios involving persistent MCP servers or advanced multi-agent communication (like A2A), you might consider other AWS compute options like AWS Fargate or Amazon ECS, which are better suited for long-running processes.
-
-### Next Steps
-
-*   **Explore API Gateway Integration:** Learn how to integrate your Lambda function with Amazon API Gateway to expose your agent as a public REST API.
-*   **Implement More Complex Tools:** Experiment with creating more sophisticated custom tools for your agents.
-*   **State Management:** For conversational agents, explore how to manage session state using services like Amazon DynamoDB or external memory solutions.
-*   **Monitoring and Logging:** Dive deeper into AWS CloudWatch for monitoring your Lambda function's performance and debugging.
-*   **Infrastructure as Code (IaC):** For production deployments, consider using AWS Cloud Development Kit (CDK) or AWS Serverless Application Model (SAM) to define and deploy your infrastructure programmatically.
-
-Happy building with Strands SDK and AWS Lambda!
+**🎯 Congratulations!** You've successfully deployed a production-ready AI agent with custom tools to AWS Lambda! Your agent is now scalable, cost-effective, and ready for real-world use.

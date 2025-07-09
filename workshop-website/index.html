@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Strands AI Agents Workshop</title>
+    <meta name="description" content="Learn to build production AI agents with AWS Strands SDK in this hands-on workshop">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <header>
+        <nav class="main-nav">
+            <div class="container">
+                <div class="logo">
+                    <a href="index.html">
+                        <h1>AWS Strands Workshop</h1>
+                    </a>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="index.html" class="active" aria-current="page">Home</a></li>
+                    <li><a href="setup.html">Setup Guide</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" aria-haspopup="true" aria-expanded="false">Modules</a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="modules/module1.html" role="menuitem">Module 1: Basics</a></li>
+                            <li><a href="modules/module2.html" role="menuitem">Module 2: Tools</a></li>
+                            <li><a href="modules/module3.html" role="menuitem">Module 3: Multi-Agent</a></li>
+                            <li><a href="modules/module4.html" role="menuitem">Module 4: Deployment</a></li>
+                            <li><a href="modules/module5.html" role="menuitem">Module 5: Advanced</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="troubleshooting.html">Troubleshooting</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>Building Production AI Agents with AWS Strands SDK</h1>
+                <p class="subtitle">A hands-on workshop for developers, AI engineers, and solution architects</p>
+                <div class="cta-buttons">
+                    <a href="setup.html" class="btn btn-primary">Get Started</a>
+                    <a href="#workshop-overview" class="btn btn-secondary">Learn More</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="workshop-overview" class="overview">
+            <div class="container">
+                <h2>Workshop Overview</h2>
+                <div class="overview-details">
+                    <div class="overview-item">
+                        <h3>Duration</h3>
+                        <p>1 hour and 20 minutes (80 minutes)</p>
+                    </div>
+                    <div class="overview-item">
+                        <h3>Format</h3>
+                        <p>Hands-on workshop with live coding</p>
+                    </div>
+                    <div class="overview-item">
+                        <h3>Target Audience</h3>
+                        <p>Developers, AI Engineers, Solution Architects</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="learning-objectives">
+            <div class="container">
+                <h2>Learning Objectives</h2>
+                <ul class="objectives-list">
+                    <li>Build AI agents using the model-driven AWS Strands SDK approach</li>
+                    <li>Integrate multiple LLM providers (Bedrock, OpenAI, NVIDIA NIM, OpenRouter)</li>
+                    <li>Create custom tools and extend agent capabilities</li>
+                    <li>Implement multi-agent orchestration patterns using agents-as-tools</li>
+                    <li>Deploy agents to production using AWS Lambda</li>
+                    <li>Understand A2A protocol for agent interoperability</li>
+                    <li>Integrate MCP (Model Context Protocol) for enhanced tool capabilities</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="journey-structure">
+            <div class="container">
+                <h2>Workshop Structure: Three-Act Journey</h2>
+                
+                <div class="journey-act">
+                    <h3>Act I: The Single Agent <span class="duration">(20 minutes)</span></h3>
+                    <p class="act-description">Master individual agent development</p>
+                    <div class="modules-container">
+                        <div class="module-card">
+                            <h4>Module 1: Hello Agent</h4>
+                            <p>Your first working agent with basic model integration</p>
+                            <a href="modules/module1.html" class="module-link">Start Module 1</a>
+                        </div>
+                        <div class="module-card">
+                            <h4>Module 2: Custom Tools</h4>
+                            <p>Extend agent capabilities with @tool decorator and MCP integration</p>
+                            <a href="modules/module2.html" class="module-link">Start Module 2</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="journey-act">
+                    <h3>Act II: Multi-Agent Orchestration <span class="duration">(35 minutes)</span></h3>
+                    <p class="act-description">Build collaborative agent systems</p>
+                    <div class="modules-container">
+                        <div class="module-card">
+                            <h4>Module 3: Research Team</h4>
+                            <p>Real multi-agent coordination using agents-as-tools pattern with MCP</p>
+                            <a href="modules/module3.html" class="module-link">Start Module 3</a>
+                        </div>
+                        <div class="module-card">
+                            <h4>Module 4: Lambda Deployment</h4>
+                            <p>Production deployment patterns and serverless architecture</p>
+                            <a href="modules/module4.html" class="module-link">Start Module 4</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="journey-act">
+                    <h3>Act III: Advanced Patterns & Interoperability <span class="duration">(25 minutes)</span></h3>
+                    <p class="act-description">Production deployment and interoperability</p>
+                    <div class="modules-container">
+                        <div class="module-card">
+                            <h4>Module 5: A2A Preview</h4>
+                            <p>Agent-to-agent communication with decoupled architecture</p>
+                            <a href="modules/module5.html" class="module-link">Start Module 5</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="prerequisites">
+            <div class="container">
+                <h2>Prerequisites</h2>
+                <div class="prerequisites-container">
+                    <div class="prerequisite-group">
+                        <h3>Required Setup</h3>
+                        <ul>
+                            <li>Python 3.10+ installed</li>
+                            <li>AWS Account with Bedrock access</li>
+                            <li>Docker (for MCP server integration)</li>
+                            <li>API Keys (optional but recommended):
+                                <ul>
+                                    <li>OpenAI API key</li>
+                                    <li>NVIDIA NIM API key</li>
+                                    <li>OpenRouter API key</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="prerequisite-group">
+                        <h3>Quick Start</h3>
+                        <ol>
+                            <li>Clone or Fork this repository</li>
+                            <li>Start a codespace in GitHub or a devcontainer in your local VSCode</li>
+                            <li>This will create an environment with the necessary packages and tools</li>
+                            <li>Configure AWS credentials: <code>aws configure</code></li>
+                            <li>Enable Claude 3.7 Sonnet in AWS Bedrock Console</li>
+                            <li>Verify setup: <code>python setup/verify_setup.py</code></li>
+                        </ol>
+                        <a href="setup.html" class="btn btn-primary">Detailed Setup Guide</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="key-technologies">
+            <div class="container">
+                <h2>Key Technologies</h2>
+                <div class="technologies-grid">
+                    <div class="technology-item">
+                        <h3>AWS Strands SDK</h3>
+                        <p>Model-driven agent framework with intelligent routing</p>
+                    </div>
+                    <div class="technology-item">
+                        <h3>Amazon Bedrock</h3>
+                        <p>Enterprise LLM service (Claude 3.7 Sonnet)</p>
+                    </div>
+                    <div class="technology-item">
+                        <h3>OpenAI</h3>
+                        <p>GPT-4 models for comparison and fallback</p>
+                    </div>
+                    <div class="technology-item">
+                        <h3>NVIDIA NIM</h3>
+                        <p>GPU-accelerated inference</p>
+                    </div>
+                    <div class="technology-item">
+                        <h3>OpenRouter</h3>
+                        <p>Cost-effective model gateway</p>
+                    </div>
+                    <div class="technology-item">
+                        <h3>MCP</h3>
+                        <p>Model Context Protocol for tool integration</p>
+                    </div>
+                    <div class="technology-item">
+                        <h3>AWS Lambda</h3>
+                        <p>Serverless deployment and production scaling</p>
+                    </div>
+                    <div class="technology-item">
+                        <h3>A2A Protocol</h3>
+                        <p>Agent-to-agent communication standard</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h2>AWS Strands Workshop</h2>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="setup.html">Setup Guide</a></li>
+                        <li><a href="modules/module1.html">Module 1: Basics</a></li>
+                        <li><a href="troubleshooting.html">Troubleshooting</a></li>
+                    </ul>
+                </div>
+                <div class="footer-resources">
+                    <h3>Additional Resources</h3>
+                    <ul>
+                        <li><a href="https://strandsagents.com/" target="_blank" rel="noopener noreferrer">AWS Strands SDK Documentation</a></li>
+                        <li><a href="https://docs.aws.amazon.com/bedrock/" target="_blank" rel="noopener noreferrer">Amazon Bedrock User Guide</a></li>
+                        <li><a href="https://modelcontextprotocol.io/" target="_blank" rel="noopener noreferrer">Model Context Protocol (MCP) Documentation</a></li>
+                        <li><a href="https://github.com/a2aproject/A2A" target="_blank" rel="noopener noreferrer">A2A Protocol Documentation</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 AWS Strands Workshop. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Prism.js for syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+    
+    <!-- Main JavaScript functionality -->
+    <script src="scripts/main.js"></script>
+</body>
+</html>

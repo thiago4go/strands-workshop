@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Troubleshooting - AWS Strands AI Agents Workshop</title>
+    <meta name="description" content="Solutions to common issues encountered during the AWS Strands AI Agents Workshop">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <header>
+        <nav class="main-nav">
+            <div class="container">
+                <div class="logo">
+                    <a href="index.html">
+                        <h1>AWS Strands Workshop</h1>
+                    </a>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="setup.html">Setup Guide</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" aria-haspopup="true" aria-expanded="false">Modules</a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="modules/module1.html" role="menuitem">Module 1: Basics</a></li>
+                            <li><a href="modules/module2.html" role="menuitem">Module 2: Tools</a></li>
+                            <li><a href="modules/module3.html" role="menuitem">Module 3: Multi-Agent</a></li>
+                            <li><a href="modules/module4.html" role="menuitem">Module 4: Deployment</a></li>
+                            <li><a href="modules/module5.html" role="menuitem">Module 5: Advanced</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="troubleshooting.html" class="active" aria-current="page">Troubleshooting</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="page-header">
+            <div class="container">
+                <h1>Troubleshooting Guide</h1>
+                <p>Solutions to common issues encountered during the workshop</p>
+            </div>
+        </section>
+
+
+        <section class="module-navigation">
+            <div class="container">
+                <nav class="module-nav">
+                <ul class="troubleshooting-nav-links">
+                    <li><a href="#setup-issues">Setup Issues</a></li>
+                    <li><a href="#aws-configuration">AWS Configuration</a></li>
+                    <li><a href="#module1-issues">Module 1 Issues</a></li>
+                    <li><a href="#module2-issues">Module 2 Issues</a></li>
+                    <li><a href="#docker-issues">Docker Issues</a></li>
+                    <li><a href="#mcp-issues">MCP Issues</a></li>
+                </ul>
+                </nav>
+            </div>
+        </section>
+
+        <div class="troubleshooting-content">
+            <div class="container">
+                <section id="setup-issues" class="troubleshooting-section">
+                    <h2>Setup Issues</h2>
+
+                    <div class="issue-item">
+                        <h3 class="issue-title">ModuleNotFoundError</h3>
+                        <p>When running Python scripts, you encounter a ModuleNotFoundError.</p>
+                        <div class="error-message">
+                            <strong>Error Message:</strong>
+                            <code>ModuleNotFoundError: No module named 'strands'</code>
+                        </div>
+                        <div class="solution">
+                            <strong>Solution:</strong>
+                            <ol>
+                                <li>Ensure your virtual environment is activated:</li>
+                            </ol>
+                            <div class="code-block">
+                                <pre><code># On macOS/Linux
+source .venv/bin/activate
+
+# On Windows
+.venv\Scripts\activate</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                            <ol start="2">
+                                <li>Install the required package:</li>
+                            </ol>
+                            <div class="code-block">
+                                <pre><code>pip install strands-agents</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                            <ol start="3">
+                                <li>Verify the installation:</li>
+                            </ol>
+                            <div class="code-block">
+                                <pre><code>python -c "from strands import Agent; print('Strands SDK installed successfully')"</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="issue-item">
+                        <h3 class="issue-title">Virtual Environment Problems</h3>
+                        <p>Issues with creating or activating the virtual environment.</p>
+                        <div class="solution">
+                            <strong>Solution:</strong>
+                            <ol>
+                                <li>Check Python version (must be 3.10+):</li>
+                            </ol>
+                            <div class="code-block">
+                                <pre><code>python --version</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                            <ol start="2">
+                                <li>Try creating the virtual environment with a specific Python version:</li>
+                            </ol>
+                            <div class="code-block">
+                                <pre><code>python3.10 -m venv .venv</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                            <ol start="3">
+                                <li>If activation fails, check for execution policy issues on Windows:</li>
+                            </ol>
+                            <div class="code-block">
+                                <pre><code># On Windows PowerShell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="aws-configuration" class="troubleshooting-section">
+                    <h2>AWS Configuration Issues</h2>
+
+                    <div class="issue-item">
+                        <h3 class="issue-title">AWS Credentials Error</h3>
+                        <p>AWS credentials not found or configured incorrectly.</p>
+                        <div class="error-message">
+                            <strong>Error Message:</strong>
+                            <code>NoCredentialsError: Unable to locate credentials</code>
+                        </div>
+                        <div class="solution">
+                            <strong>Solution:</strong>
+                            <ol>
+                                <li>Configure AWS credentials:</li>
+                            </ol>
+                            <div class="code-block">
+                                <pre><code>aws configure</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                            <ol start="2">
+                                <li>Or set environment variables:</li>
+                            </ol>
+                            <div class="code-block">
+                                <pre><code>export AWS_ACCESS_KEY_ID=your_key
+export AWS_SECRET_ACCESS_KEY=your_secret
+export AWS_REGION=us-west-2</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                            <ol start="3">
+                                <li>Verify credentials are working:</li>
+                            </ol>
+                            <div class="code-block">
+                                <pre><code>aws sts get-caller-identity</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="issue-item">
+                        <h3 class="issue-title">Bedrock Access Denied</h3>
+                        <p>Access denied when trying to use Bedrock models.</p>
+                        <div class="error-message">
+                            <strong>Error Message:</strong>
+                            <code>AccessDeniedException: User is not authorized to perform: bedrock:InvokeModel</code>
+                        </div>
+                        <div class="solution">
+                            <strong>Solution:</strong>
+                            <ol>
+                                <li>Enable Claude 3.7 Sonnet in <a href="https://us-west-2.console.aws.amazon.com/bedrock/home?region=us-west-2#/modelaccess" target="_blank" rel="noopener noreferrer">AWS Bedrock Console</a></li>
+                                <li>Add IAM permissions for <code>bedrock:InvokeModel</code> and <code>bedrock:ListFoundationModels</code></li>
+                                <li>Check that your AWS user/role has the necessary permissions</li>
+                                <li>Verify the model is available in your selected region</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="issue-item">
+                        <h3 class="issue-title">Region Mismatch</h3>
+                        <p>Model not available in the specified region.</p>
+                        <div class="error-message">
+                            <strong>Error Message:</strong>
+                            <code>ValidationException: The model ID is not supported in this region</code>
+                        </div>
+                        <div class="solution">
+                            <strong>Solution:</strong>
+                            <ol>
+                                <li>Use a supported region for Claude 3.7 Sonnet (us-east-1, us-west-2)</li>
+                                <li>Update the region in your BedrockModel configuration:</li>
+                            </ol>
+                            <div class="code-block">
+                                <pre><code>model = BedrockModel(
+    model_id="us.anthropic.claude-3-7-sonnet-20250219-v1:0",
+    region_name="us-west-2",  # Change to supported region
+)</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="module1-issues" class="troubleshooting-section">
+                    <h2>Module 1: Hello Agent Issues</h2>
+
+                    <div class="issue-item">
+                        <h3 class="issue-title">Agent Not Responding</h3>
+                        <p>Agent created but not responding to queries.</p>
+                        <div class="solution">
+                            <strong>Solution:</strong>
+                            <ol>
+                                <li>Check AWS credentials and Bedrock access</li>
+                                <li>Verify the model ID is correct:</li>
+                            </ol>
+                            <div class="code-block">
+                                <pre><code># Correct model ID
+model_id="us.anthropic.claude-3-7-sonnet-20250219-v1:0"</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                            <ol start="3">
+                                <li>Try with explicit configuration:</li>
+                            </ol>
+                            <div class="code-block">
+                                <pre><code>from strands import Agent
+from strands.models import BedrockModel
+
+model = BedrockModel(
+    model_id="us.anthropic.claude-3-7-sonnet-20250219-v1:0",
+    region_name="us-west-2",
+    temperature=0.3
+)
+
+agent = Agent(model=model)
+response = agent("Hello, world!")
+print(response)</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="issue-item">
+                        <h3 class="issue-title">Slow Response Times</h3>
+                        <p>Agent responses are taking a long time.</p>
+                        <div class="solution">
+                            <strong>Solution:</strong>
+                            <ol>
+                                <li>Check your internet connection</li>
+                                <li>Consider using a region closer to your location</li>
+                                <li>Reduce the complexity of your queries</li>
+                                <li>Set a lower max_tokens value to get shorter responses:</li>
+                            </ol>
+                            <div class="code-block">
+                                <pre><code>model = BedrockModel(
+    model_id="us.anthropic.claude-3-7-sonnet-20250219-v1:0",
+    max_tokens=100  # Limit response length
+)</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="module2-issues" class="troubleshooting-section">
+                    <h2>Module 2: Custom Tools Issues</h2>
+
+                    <div class="collapsible-section">
+                        <div class="collapsible-header" role="button" tabindex="0" aria-expanded="false" aria-controls="mcp-client-error">
+                            <h3>MCP Client Initialization Error</h3>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="collapsible-content" id="mcp-client-error">
+                            <p>Error when initializing MCP client.</p>
+                            <div class="error-message">
+                                <strong>Error Message:</strong>
+                                <code>MCPClientInitializationError: Failed to initialize MCP client</code>
+                            </div>
+                            <div class="solution">
+                                <strong>Solution:</strong>
+                                <ol>
+                                    <li>Ensure Docker is running</li>
+                                    <li>Create agent inside the MCP client context manager:</li>
+                                </ol>
+                                <div class="code-block">
+                                    <pre><code>client = MCPClient(...)
+with client:
+    tools = client.list_tools_sync()
+    agent = Agent(model=model, tools=tools)
+    response = agent("task")</code></pre>
+                                    <button class="copy-btn">Copy</button>
+                                </div>
+                                <ol start="3">
+                                    <li>Check that the MCP server is installed:</li>
+                                </ol>
+                                <div class="code-block">
+                                    <pre><code>npm install -g @modelcontextprotocol/server-filesystem
+npm install -g @modelcontextprotocol/server-memory</code></pre>
+                                    <button class="copy-btn">Copy</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="collapsible-section">
+                        <div class="collapsible-header" role="button" tabindex="0" aria-expanded="false" aria-controls="custom-tool-error">
+                            <h3>Custom Tool Not Working</h3>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="collapsible-content" id="custom-tool-error">
+                            <p>Agent not using the custom tool correctly.</p>
+                            <div class="solution">
+                                <strong>Solution:</strong>
+                                <ol>
+                                    <li>Ensure the tool is properly decorated with <code>@tool</code></li>
+                                    <li>Check that the tool function has type annotations:</li>
+                                </ol>
+                                <div class="code-block">
+                                    <pre><code>@tool
+def multiply(a: int, b: int) -> int:
+    """Multiplies two integers and returns the result."""
+    return a * b</code></pre>
+                                    <button class="copy-btn">Copy</button>
+                                </div>
+                                <ol start="3">
+                                    <li>Verify the tool is passed to the agent:</li>
+                                </ol>
+                                <div class="code-block">
+                                    <pre><code>agent = Agent(
+    model=model,
+    tools=[multiply]  # Pass the tool function
+)</code></pre>
+                                    <button class="copy-btn">Copy</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="docker-issues" class="troubleshooting-section">
+                    <h2>Docker Issues</h2>
+
+                    <div class="issue-item">
+                        <h3 class="issue-title">Docker Not Running</h3>
+                        <p>Docker is not running or not accessible.</p>
+                        <div class="error-message">
+                            <strong>Error Message:</strong>
+                            <code>Cannot connect to the Docker daemon</code>
+                        </div>
+                        <div class="solution">
+                            <strong>Solution:</strong>
+                            <ol>
+                                <li>Start Docker Desktop (on macOS/Windows)</li>
+                                <li>Start Docker service (on Linux):</li>
+                            </ol>
+                            <div class="code-block">
+                                <pre><code>sudo systemctl start docker</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                            <ol start="3">
+                                <li>Verify Docker is running:</li>
+                            </ol>
+                            <div class="code-block">
+                                <pre><code>docker info</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="issue-item">
+                        <h3 class="issue-title">Docker Permission Issues</h3>
+                        <p>Permission denied when running Docker commands.</p>
+                        <div class="error-message">
+                            <strong>Error Message:</strong>
+                            <code>permission denied while trying to connect to the Docker daemon socket</code>
+                        </div>
+                        <div class="solution">
+                            <strong>Solution:</strong>
+                            <ol>
+                                <li>Add your user to the docker group (Linux):</li>
+                            </ol>
+                            <div class="code-block">
+                                <pre><code>sudo usermod -aG docker $USER
+newgrp docker</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                            <ol start="2">
+                                <li>Run Docker Desktop as administrator (Windows)</li>
+                                <li>Check socket permissions (Linux):</li>
+                            </ol>
+                            <div class="code-block">
+                                <pre><code>sudo chmod 666 /var/run/docker.sock</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="mcp-issues" class="troubleshooting-section">
+                    <h2>MCP Issues</h2>
+
+                    <div class="issue-item">
+                        <h3 class="issue-title">MCP Server Not Found</h3>
+                        <p>MCP server not found or not running.</p>
+                        <div class="error-message">
+                            <strong>Error Message:</strong>
+                            <code>Error: Could not connect to MCP server</code>
+                        </div>
+                        <div class="solution">
+                            <strong>Solution:</strong>
+                            <ol>
+                                <li>Install MCP servers:</li>
+                            </ol>
+                            <div class="code-block">
+                                <pre><code>npm install -g @modelcontextprotocol/server-filesystem
+npm install -g @modelcontextprotocol/server-memory</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                            <ol start="2">
+                                <li>Check Node.js is installed:</li>
+                            </ol>
+                            <div class="code-block">
+                                <pre><code>node --version</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                            <ol start="3">
+                                <li>Verify Docker is running (for Docker-based MCP servers)</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="issue-item">
+                        <h3 class="issue-title">MCP Tool Execution Failures</h3>
+                        <p>Errors when executing MCP tools.</p>
+                        <div class="solution">
+                            <strong>Solution:</strong>
+                            <ol>
+                                <li>Check tool parameters match the expected schema</li>
+                                <li>Ensure proper context manager usage:</li>
+                            </ol>
+                            <div class="code-block">
+                                <pre><code>client = MCPClient(...)
+with client:  # Important: create agent inside context
+    tools = client.list_tools_sync()
+    agent = Agent(model=model, tools=tools)
+    response = agent("task")</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                            <ol start="3">
+                                <li>Verify the MCP server has necessary permissions</li>
+                            </ol>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <section class="support-resources">
+            <div class="container">
+                <h2>Getting Additional Help</h2>
+                <div class="resources-grid">
+                    <div class="resource-item">
+                        <h3>Documentation</h3>
+                        <ul>
+                            <li>Check <code>setup/troubleshooting.md</code> for detailed issue resolution</li>
+                            <li>Use setup verification scripts: <code>python setup/verify_setup.py</code></li>
+                            <li>Review individual module READMEs for specific guidance</li>
+                        </ul>
+                    </div>
+                    <div class="resource-item">
+                        <h3>External Resources</h3>
+                        <ul>
+                            <li><a href="https://strandsagents.com/" target="_blank" rel="noopener noreferrer">AWS Strands SDK Documentation</a></li>
+                            <li><a href="https://community.aws/strands" target="_blank" rel="noopener noreferrer">AWS Strands Community Forum</a></li>
+                            <li><a href="https://github.com/aws-samples/strands-workshop/issues" target="_blank" rel="noopener noreferrer">Submit issues on GitHub</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h2>AWS Strands Workshop</h2>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="setup.html">Setup Guide</a></li>
+                        <li><a href="modules/module1.html">Module 1: Basics</a></li>
+                        <li><a href="troubleshooting.html">Troubleshooting</a></li>
+                    </ul>
+                </div>
+                <div class="footer-resources">
+                    <h3>Additional Resources</h3>
+                    <ul>
+                        <li><a href="https://strandsagents.com/" target="_blank" rel="noopener noreferrer">AWS Strands SDK Documentation</a></li>
+                        <li><a href="https://docs.aws.amazon.com/bedrock/" target="_blank" rel="noopener noreferrer">Amazon Bedrock User Guide</a></li>
+                        <li><a href="https://modelcontextprotocol.io/" target="_blank" rel="noopener noreferrer">Model Context Protocol (MCP) Documentation</a></li>
+                        <li><a href="https://github.com/a2aproject/A2A" target="_blank" rel="noopener noreferrer">A2A Protocol Documentation</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 AWS Strands Workshop. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Prism.js for syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+    
+    <!-- Main JavaScript functionality -->
+    <script src="scripts/main.js"></script>
+</body>
+</html>

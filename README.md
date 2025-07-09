@@ -18,7 +18,21 @@ By the end of this workshop, you will be able to:
 6. Understand A2A protocol for agent interoperability
 7. Integrate MCP (Model Context Protocol) for enhanced tool capabilities
 
-## 📋 Prerequisites
+## 🚀 Quick Start with GitHub Codespaces (Recommended)
+
+**Get started in under 2 minutes with zero local setup!**
+
+1. **Fork this repository**: [Fork strands-workshop](https://github.com/thiago4go/strands-workshop/fork)
+2. **Launch Codespace**: Click "Code" → "Create codespace on main"
+3. **Wait for setup** (2-3 minutes): All dependencies install automatically
+4. **Configure AWS**: Run `aws configure` and enable Claude 3.7 Sonnet in [Bedrock Console](https://us-west-2.console.aws.amazon.com/bedrock/home?region=us-west-2#/modelaccess)
+5. **Verify & Start**: `python setup/verify_setup.py` then begin Module 1
+
+[📖 **Detailed Codespaces Setup Guide**](CODESPACES_SETUP.md)
+
+## 📋 Prerequisites (Local Setup Only)
+
+*Skip this section if using Codespaces above*
 
 ### Required Setup
 - **Python 3.10+** installed
@@ -30,9 +44,9 @@ By the end of this workshop, you will be able to:
   - OpenRouter API key
 
 ### Pre-Workshop Setup
-1. Clone or Fork this repository
-2. Start a codespace in GitHub or a devcontainer in your local VSCode
-3. This will create an environment with the necessary packages and tools
+1. Fork and clone this repository
+2. Create virtual environment: `python -m venv .venv && source .venv/bin/activate`
+3. Install dependencies: `pip install -r requirements.txt`
 4. Configure AWS credentials: `aws configure`
 5. Enable Claude 3.7 Sonnet in [AWS Bedrock Console](https://us-west-2.console.aws.amazon.com/bedrock/home?region=us-west-2#/modelaccess)
 6. Verify setup: `python setup/verify_setup.py`

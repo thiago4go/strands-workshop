@@ -42,7 +42,7 @@
     "install uv": "curl -LsSf https://astral.sh/uv/install.sh | sh && echo 'export PATH=\"$HOME/.cargo/bin:$PATH\"' >> ~/.bashrc && echo 'export PATH=\"$HOME/.cargo/bin:$PATH\"' >> ~/.bash_profile && echo 'export PATH=\"$HOME/.cargo/bin:$PATH\"' >> ~/.zshrc",
 
     // Install Strands SDK, MCP CLI, and workshop utilities
-    "install strands sdk": "pip install strands-agents strands-agents[openai] strands-agents[litellm] strands-agents-tools strands-agents-builder a2a-sdk strands-nvidia-nim mcp[cli] fastmcp python-dotenv rich",
+    "install strands sdk": "pip install strands-agents strands-agents[openai] strands-agents[litellm] strands-agents-tools strands-agents-builder a2a-sdk a2a-sdk[sqlite] strands-nvidia-nim mcp[cli] fastmcp python-dotenv rich",
 
     // Setup MCP Inspector UI
     "setup mcp inspector": "git clone https://github.com/modelcontextprotocol/inspector.git /home/vscode/inspector && cd /home/vscode/inspector && npm install",

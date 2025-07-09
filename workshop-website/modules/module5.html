@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 5: A2A Preview & Advanced Patterns - AWS Strands AI Agents Workshop</title>
+    <meta name="description" content="Explore advanced agent patterns with A2A protocol and decoupled architectures">
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="../styles/main.css">
+    <style>
+        .warning-box {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .warning-box h3 {
+            color: #856404;
+            margin-top: 0;
+        }
+        .warning-box blockquote {
+            background-color: #f8f9fa;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            font-style: italic;
+        }
+        .status-table table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .status-table th, .status-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        .status-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        .status-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body data-module="module5">
+    <header>
+        <nav class="main-nav">
+            <div class="container">
+                <div class="logo">
+                    <a href="../index.html">
+                        <h1>AWS Strands Workshop</h1>
+                    </a>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="../setup.html">Setup Guide</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" aria-haspopup="true" aria-expanded="false">Modules</a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="module1.html" role="menuitem">Module 1: Basics</a></li>
+                            <li><a href="module2.html" role="menuitem">Module 2: Tools</a></li>
+                            <li><a href="module3.html" role="menuitem">Module 3: Multi-Agent</a></li>
+                            <li><a href="module4.html" role="menuitem">Module 4: Deployment</a></li>
+                            <li><a href="module5.html" class="active" role="menuitem" aria-current="page">Module 5: Advanced</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="../troubleshooting.html">Troubleshooting</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="module-header">
+            <div class="container">
+                <div class="module-badge">Module 5</div>
+                <h1>A2A Preview & Advanced Patterns</h1>
+                <div class="module-meta">
+                    <span><i class="icon-clock"></i> 40 minutes</span>
+                    <span><i class="icon-level"></i> Expert</span>
+                    <span>Act III: Advanced Architectures</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="module-navigation">
+            <div class="container">
+                <nav class="module-nav">
+                    <ul>
+                        <li><a href="#learning-objectives">Learning Objectives</a></li>
+                        <li><a href="#prerequisites">Prerequisites</a></li>
+                        <li><a href="#a2a-protocol">A2A Protocol</a></li>
+                        <li><a href="#architecture">Architecture</a></li>
+                        <li><a href="#step-by-step">Step-by-Step</a></li>
+                        <li><a href="#code-examples">Code Examples</a></li>
+                        <li><a href="#advanced-patterns">Advanced Patterns</a></li>
+                        <li><a href="#common-issues">Common Issues</a></li>
+                        <li><a href="#next-steps">Next Steps</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </section>
+
+        <div class="module-content">
+            <div class="container">
+                <div class="module-progress">
+                    <div class="progress-header">
+                        <h3>Your Progress</h3>
+                        <span class="progress-percentage">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-bar-fill"></div>
+                    </div>
+                </div>
+
+                <section id="learning-objectives" class="content-section">
+                    <h2>Learning Objectives</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="objectives-read" class="progress-checkbox" data-module="module5" data-step="objectives">
+                        <label for="objectives-read">Review learning objectives</label>
+                    </div>
+                    <ul>
+                        <li>Understand the A2A (Agent-to-Agent) protocol specification</li>
+                        <li>Implement decoupled multi-agent architectures</li>
+                        <li>Create independent agent servers with HTTP communication</li>
+                        <li>Use Agent Cards for service discovery</li>
+                        <li>Handle distributed agent orchestration patterns</li>
+                        <li>Build production-ready scalable agent systems</li>
+                    </ul>
+                </section>
+
+                <section id="prerequisites" class="content-section">
+                    <h2>Prerequisites</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="prerequisites-check" class="progress-checkbox" data-module="module5" data-step="prerequisites">
+                        <label for="prerequisites-check">Verify prerequisites are met</label>
+                    </div>
+                    <ul>
+                        <li>Completed all previous modules (1-4)</li>
+                        <li>Understanding of HTTP/REST APIs</li>
+                        <li>Basic knowledge of distributed systems</li>
+                        <li>Familiarity with JSON-RPC 2.0 protocol</li>
+                        <li>Python async/await concepts</li>
+                    </ul>
+                    <div class="code-block">
+                        <pre><code># Install A2A dependencies
+pip install strands-agents[a2a]
+pip install a2a-sdk
+
+# Verify installation
+python -c "from strands.multiagent.a2a import A2AServer; print('A2A components available')"</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                </section>
+
+                <section id="a2a-protocol" class="content-section">
+                    <h2>A2A Protocol Overview</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="a2a-protocol-review" class="progress-checkbox" data-module="module5" data-step="a2a-protocol">
+                        <label for="a2a-protocol-review">Review A2A protocol concepts</label>
+                    </div>
+
+                    <div class="warning-box">
+                        <h3>⚠️ Experimental Feature Warning</h3>
+                        <p><strong>From Official Strands Documentation:</strong></p>
+                        <blockquote>
+                            "A2A support in Strands is currently <strong>EXPERIMENTAL</strong>. APIs may change, and additional functionality will be added in future releases. If you encounter bugs or have feature requests, please report them on GitHub."
+                        </blockquote>
+                        <p>This implementation uses experimental components that may change in future releases.</p>
+                    </div>
+
+                    <h3>What is A2A?</h3>
+                    <p>The Agent-to-Agent (A2A) protocol is a standardized communication protocol that enables AI agents to discover, connect, and communicate with each other over HTTP. In Strands, this is implemented through <code>A2AServer</code> (not A2AAgent) which wraps Strands agents to provide HTTP-based communication capabilities.</p>
+
+                    <div class="comparison-table">
+                        <h4>Traditional vs A2A Multi-Agent Systems</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Traditional Multi-Agent</th>
+                                    <th>A2A Protocol</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Tight coupling between agents</td>
+                                    <td>True decoupling with HTTP communication</td>
+                                </tr>
+                                <tr>
+                                    <td>Shared memory and state</td>
+                                    <td>Independent processes with no shared state</td>
+                                </tr>
+                                <tr>
+                                    <td>Framework-specific communication</td>
+                                    <td>Standardized JSON-RPC 2.0 over HTTP</td>
+                                </tr>
+                                <tr>
+                                    <td>Manual service discovery</td>
+                                    <td>Automatic discovery via Agent Cards</td>
+                                </tr>
+                                <tr>
+                                    <td>Single point of failure</td>
+                                    <td>Fault isolation and resilience</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Key A2A Concepts</h3>
+                    <div class="concept-grid">
+                        <div class="concept-card">
+                            <h4>🎴 Agent Cards</h4>
+                            <p>JSON metadata describing agent capabilities, available at <code>/.well-known/agent.json</code></p>
+                        </div>
+                        <div class="concept-card">
+                            <h4>🌐 A2AServer</h4>
+                            <p>Wraps Strands agents to provide A2A server capabilities over HTTP (experimental component)</p>
+                        </div>
+                        <div class="concept-card">
+                            <h4>⚙️ StrandsA2AExecutor</h4>
+                            <p>Handles agent execution within A2A context (used internally by A2AServer)</p>
+                        </div>
+                        <div class="concept-card">
+                            <h4>📡 A2AClient</h4>
+                            <p>Client for communicating with remote A2A agents (from stable a2a-sdk)</p>
+                        </div>
+                        <div class="concept-card">
+                            <h4>🔍 Service Discovery</h4>
+                            <p>Agents discover each other via Agent Cards using A2ACardResolver</p>
+                        </div>
+                        <div class="concept-card">
+                            <h4>🏗️ Decoupled Architecture</h4>
+                            <p>Agents run independently without shared state or memory</p>
+                        </div>
+                    </div>
+
+                    <h3>Current Implementation Status</h3>
+                    <div class="status-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Component</th>
+                                    <th>Status</th>
+                                    <th>Stability</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>A2AServer</td>
+                                    <td>✅ Working</td>
+                                    <td>⚠️ Experimental</td>
+                                    <td>Subject to API changes</td>
+                                </tr>
+                                <tr>
+                                    <td>StrandsA2AExecutor</td>
+                                    <td>✅ Working</td>
+                                    <td>⚠️ Experimental</td>
+                                    <td>Internal component</td>
+                                </tr>
+                                <tr>
+                                    <td>A2AClient</td>
+                                    <td>✅ Working</td>
+                                    <td>✅ Stable</td>
+                                    <td>From a2a-sdk package</td>
+                                </tr>
+                                <tr>
+                                    <td>A2ACardResolver</td>
+                                    <td>✅ Working</td>
+                                    <td>✅ Stable</td>
+                                    <td>Service discovery</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="architecture" class="content-section">
+                    <h2>A2A Architecture Overview</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="architecture-review" class="progress-checkbox" data-module="module5" data-step="architecture">
+                        <label for="architecture-review">Review A2A architecture</label>
+                    </div>
+                    
+                    <div class="architecture-diagram">
+                        <h3>Decoupled A2A Multi-Agent System</h3>
+                        <div class="diagram-container">
+                            <pre class="mermaid-diagram">
+graph TB
+    Orchestrator[🎯 Orchestrator Client<br/>A2AClient] --> HTTP1[🌐 HTTP/A2A<br/>JSON-RPC 2.0]
+    
+    HTTP1 --> ResearchServer[🔬 Research Agent Server<br/>A2AServer - Port 9001]
+    HTTP1 --> AnalysisServer[📊 Analysis Agent Server<br/>A2AServer - Port 9002]
+    HTTP1 --> FactCheckServer[✅ FactCheck Agent Server<br/>A2AServer - Port 9003]
+    HTTP1 --> QAServer[🏆 QA Agent Server<br/>A2AServer - Port 9004]
+    
+    ResearchServer --> ResearchAgent[🔍 Research Specialist<br/>Strands Agent + DuckDuckGo]
+    AnalysisServer --> AnalysisAgent[📈 Analysis Specialist<br/>Strands Agent + Sequential Thinking]
+    FactCheckServer --> FactCheckAgent[🔍 FactCheck Specialist<br/>Strands Agent + DuckDuckGo]
+    QAServer --> QAAgent[⭐ QA Specialist<br/>Strands Agent + Combined Tools]
+    
+    ResearchServer --> AgentCard1[🎴 Agent Card<br/>/.well-known/agent.json]
+    AnalysisServer --> AgentCard2[🎴 Agent Card<br/>/.well-known/agent.json]
+    FactCheckServer --> AgentCard3[🎴 Agent Card<br/>/.well-known/agent.json]
+    QAServer --> AgentCard4[🎴 Agent Card<br/>/.well-known/agent.json]
+    
+    ResearchAgent --> BedrockModel1[🧠 Bedrock Model<br/>Claude 3.7 Sonnet]
+    AnalysisAgent --> BedrockModel2[🧠 Bedrock Model<br/>Claude 3.7 Sonnet]
+    FactCheckAgent --> BedrockModel3[🧠 Bedrock Model<br/>Claude 3.7 Sonnet]
+    QAAgent --> BedrockModel4[🧠 Bedrock Model<br/>Claude 3.7 Sonnet]
+    
+    BedrockModel1 --> AWSBedrock[☁️ AWS Bedrock<br/>us.anthropic.claude-3-7-sonnet-20250219-v1:0]
+    BedrockModel2 --> AWSBedrock
+    BedrockModel3 --> AWSBedrock
+    BedrockModel4 --> AWSBedrock
+    
+    subgraph "Independent Agent Servers"
+        ResearchServer
+        AnalysisServer
+        FactCheckServer
+        QAServer
+    end
+    
+    subgraph "Service Discovery"
+        AgentCard1
+        AgentCard2
+        AgentCard3
+        AgentCard4
+    end
+    
+    subgraph "Specialist Agents"
+        ResearchAgent
+        AnalysisAgent
+        FactCheckAgent
+        QAAgent
+    end
+            </pre>
+                        </div>
+                    </div>
+
+                    <h3>A2A Benefits</h3>
+                    <ul>
+                        <li><strong>🔄 True Decoupling</strong>: Each agent runs independently with its own process and memory</li>
+                        <li><strong>📈 Scalability</strong>: Individual agents can be scaled, updated, or replaced without affecting others</li>
+                        <li><strong>🛡️ Fault Isolation</strong>: If one agent fails, others continue operating</li>
+                        <li><strong>🌐 Interoperability</strong>: Agents built with different frameworks can communicate via A2A</li>
+                        <li><strong>🏢 Enterprise-Ready</strong>: Built-in support for authentication, authorization, and monitoring</li>
+                    </ul>
+                </section>
+
+                <section id="step-by-step" class="content-section">
+                    <h2>Step-by-Step Implementation</h2>
+
+                    <div class="step-item">
+                        <div class="step-checkbox">
+                            <input type="checkbox" id="step-5-1" class="progress-checkbox" data-module="module5" data-step="1">
+                            <label for="step-5-1"><strong>Step 1: Create A2A Agent Server</strong></label>
+                        </div>
+                        <div class="step-content">
+                            <p>Create an independent agent server using A2AServer (experimental component):</p>
+                            <div class="code-block">
+                                <pre><code># research_agent_server.py
+import logging
+from strands import Agent
+from strands.multiagent.a2a import A2AServer
+from strands.models import BedrockModel
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger(__name__)
+
+def create_research_agent():
+    """Create and configure the research specialist agent"""
+    
+    # Use Bedrock Claude model for research tasks
+    # AWS credentials should be configured via aws configure or environment variables
+    model = BedrockModel(
+        model_id="us.anthropic.claude-3-7-sonnet-20250219-v1:0",
+        temperature=0.3,
+        region="us-west-2"  # Specify region explicitly
+    )
+    
+    # Create the research specialist agent
+    agent = Agent(
+        name="ResearchSpecialist",
+        description="A specialized research agent that performs comprehensive web research and analysis",
+        model=model,
+        system_prompt="""You are a Research Specialist agent with expertise in conducting thorough research and analysis.
+
+Your capabilities:
+- Analyze and research topics comprehensively
+- Provide well-structured information with clear reasoning
+- Focus on accuracy, relevance, and completeness
+- Break down complex topics into understandable components
+
+When conducting research:
+1. Break down the topic into key components
+2. Provide comprehensive analysis based on your knowledge
+3. Organize information logically and clearly
+4. Highlight key insights and important details
+5. Provide actionable recommendations when appropriate
+
+Always strive for thorough, well-reasoned research that provides valuable insights and practical value."""
+    )
+    
+    return agent
+
+def main():
+    """Main entry point for the research agent server"""
+    
+    logger.info("Starting Research Agent A2A Server...")
+    
+    try:
+        # Create the research agent
+        research_agent = create_research_agent()
+        logger.info("✅ Research agent created successfully")
+        
+        # Create A2A server using the actual available class
+        a2a_server = A2AServer(
+            agent=research_agent,
+            host="localhost",
+            port=9001
+        )
+        
+        logger.info("✅ A2AServer created successfully")
+        logger.info(f"Research Agent server starting on http://localhost:9001")
+        logger.info("Agent Card will be available at http://localhost:9001/.well-known/agent.json")
+        
+        # Start serving (this blocks)
+        a2a_server.serve()
+        
+    except KeyboardInterrupt:
+        logger.info("Research Agent server shutting down...")
+    except Exception as e:
+        logger.error(f"Error starting Research Agent server: {e}")
+        import traceback
+        traceback.print_exc()
+        raise
+
+if __name__ == "__main__":
+    main()</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <div class="step-checkbox">
+                            <input type="checkbox" id="step-5-2" class="progress-checkbox" data-module="module5" data-step="2">
+                            <label for="step-5-2"><strong>Step 2: Create A2A Client</strong></label>
+                        </div>
+                        <div class="step-content">
+                            <p>Build a client to communicate with A2A agents:</p>
+                            <div class="code-block">
+                                <pre><code># orchestrator_client.py
+import asyncio
+import httpx
+from uuid import uuid4
+from a2a.client import A2ACardResolver, A2AClient
+from a2a.types import MessageSendParams, SendMessageRequest
+
+async def communicate_with_agent(base_url: str, message: str):
+    """Communicate with an A2A agent."""
+    async with httpx.AsyncClient() as httpx_client:
+        # Discover the agent via its Agent Card
+        resolver = A2ACardResolver(
+            httpx_client=httpx_client,
+            base_url=base_url
+        )
+        
+        agent_card = await resolver.get_agent_card()
+        print(f"✅ Connected to: {agent_card.name}")
+        
+        # Create A2A client
+        client = A2AClient(
+            httpx_client=httpx_client,
+            agent_card=agent_card
+        )
+        
+        # Send message using A2A protocol
+        request = SendMessageRequest(
+            id=str(uuid4()),
+            params=MessageSendParams(
+                message={
+                    "role": "user",
+                    "parts": [{"kind": "text", "text": message}],
+                    "messageId": uuid4().hex,
+                }
+            ),
+        )
+        
+        print(f"📤 Sending: {message}")
+        response = await client.send_message(request)
+        
+        # Extract response text
+        response_text = ""
+        if hasattr(response, 'result') and response.result:
+            if hasattr(response.result, 'message') and response.result.message:
+                message_obj = response.result.message
+                if hasattr(message_obj, 'parts') and message_obj.parts:
+                    for part in message_obj.parts:
+                        if hasattr(part, 'text'):
+                            response_text += part.text
+        
+        return response_text
+
+async def main():
+    """Orchestrate communication with multiple A2A agents."""
+    print("🎯 A2A Orchestrator Client")
+    print("="*50)
+    
+    # Communicate with Research Agent
+    try:
+        research_response = await communicate_with_agent(
+            "http://localhost:9001",
+            "Research the latest trends in artificial intelligence for 2025"
+        )
+        
+        print("\n📥 Research Agent Response:")
+        print("-" * 40)
+        print(research_response)
+        print("-" * 40)
+        
+    except Exception as e:
+        print(f"❌ Failed to communicate with Research Agent: {e}")
+
+if __name__ == "__main__":
+    asyncio.run(main())</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <div class="step-checkbox">
+                            <input type="checkbox" id="step-5-3" class="progress-checkbox" data-module="module5" data-step="3">
+                            <label for="step-5-3"><strong>Step 3: Test Agent Card Discovery</strong></label>
+                        </div>
+                        <div class="step-content">
+                            <p>Verify Agent Card service discovery:</p>
+                            <div class="code-block">
+                                <pre><code># Test Agent Card discovery
+curl http://localhost:9001/.well-known/agent.json | jq</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                            <p><strong>Expected Agent Card Format:</strong></p>
+                            <div class="code-block">
+                                <pre><code>{
+  "name": "ResearchSpecialist",
+  "description": "A specialized research agent...",
+  "version": "1.0.0",
+  "protocolVersion": "0.2.5",
+  "url": "http://localhost:9001/",
+  "capabilities": {},
+  "skills": [],
+  "defaultInputModes": ["text"],
+  "defaultOutputModes": ["text"]
+}</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <div class="step-checkbox">
+                            <input type="checkbox" id="step-5-4" class="progress-checkbox" data-module="module5" data-step="4">
+                            <label for="step-5-4"><strong>Step 4: Run A2A Implementation</strong></label>
+                        </div>
+                        <div class="step-content">
+                            <p>Execute the complete A2A implementation using the interactive menu:</p>
+                            <div class="code-block">
+                                <pre><code># Navigate to module5-advanced directory
+cd exercises/module5-advanced
+
+# Run the interactive main entry point
+python3 main.py</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                            <p><strong>Interactive Menu Options:</strong></p>
+                            <div class="code-block">
+                                <pre><code>╔══════════════════════════════════════════════════════════════════════════════╗
+║                    Module 5: A2A Research Team                              ║
+║                  Agent-to-Agent Multi-Agent Orchestration                   ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+Choose an option:
+
+1. 🚀 Start All Agent Servers
+   Launch all A2A agent servers in the background
+
+2. 🧪 Test Individual Agents  
+   Test each agent server individually to verify functionality
+
+3. 🎯 Run Research Orchestrator
+   Execute a comprehensive research task using all agents
+
+4. 📖 View Documentation
+   Show detailed information about the A2A implementation
+
+5. ❌ Exit</code></pre>
+                            </div>
+                            <p><strong>Recommended Workflow:</strong></p>
+                            <ol>
+                                <li>Choose option 1 to start all agent servers</li>
+                                <li>Choose option 2 to test individual agents</li>
+                                <li>Choose option 3 to run the full orchestrator</li>
+                            </ol>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="code-examples" class="content-section">
+                    <h2>Advanced Code Examples</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="code-examples-review" class="progress-checkbox" data-module="module5" data-step="examples">
+                        <label for="code-examples-review">Review advanced examples</label>
+                    </div>
+
+                    <h3>Multi-Agent A2A System</h3>
+                    <div class="code-block">
+                        <pre><code># main.py - Complete A2A Multi-Agent System
+import asyncio
+import logging
+from typing import List, Dict
+import httpx
+from uuid import uuid4
+from a2a.client import A2ACardResolver, A2AClient
+from a2a.types import MessageSendParams, SendMessageRequest
+
+class A2AOrchestrator:
+    """Orchestrator for A2A multi-agent system."""
+    
+    def __init__(self):
+        self.agents = {
+            "research": "http://localhost:9001",
+            "analysis": "http://localhost:9002", 
+            "factcheck": "http://localhost:9003",
+            "qa": "http://localhost:9004"
+        }
+        self.logger = logging.getLogger(__name__)
+    
+    async def discover_agents(self) -> Dict[str, any]:
+        """Discover all available A2A agents."""
+        discovered = {}
+        
+        async with httpx.AsyncClient() as client:
+            for name, url in self.agents.items():
+                try:
+                    resolver = A2ACardResolver(client, url)
+                    agent_card = await resolver.get_agent_card()
+                    discovered[name] = {
+                        'url': url,
+                        'card': agent_card,
+                        'client': A2AClient(client, agent_card)
+                    }
+                    self.logger.info(f"✅ Discovered {name} agent: {agent_card.name}")
+                except Exception as e:
+                    self.logger.warning(f"❌ Could not discover {name} agent: {e}")
+        
+        return discovered
+    
+    async def coordinate_research(self, topic: str) -> str:
+        """Coordinate multi-agent research using A2A protocol."""
+        self.logger.info(f"🎯 Starting A2A research coordination for: {topic}")
+        
+        # Discover available agents
+        agents = await self.discover_agents()
+        
+        if not agents:
+            return "No A2A agents available for research"
+        
+        results = []
+        
+        # Step 1: Research phase
+        if 'research' in agents:
+            research_result = await self._send_message(
+                agents['research']['client'],
+                f"Research the topic: {topic}. Provide comprehensive findings."
+            )
+            results.append(f"🔬 Research: {research_result}")
+        
+        # Step 2: Analysis phase
+        if 'analysis' in agents and results:
+            analysis_result = await self._send_message(
+                agents['analysis']['client'],
+                f"Analyze this research data: {results[-1]}"
+            )
+            results.append(f"📊 Analysis: {analysis_result}")
+        
+        # Step 3: Fact-checking phase
+        if 'factcheck' in agents and results:
+            factcheck_result = await self._send_message(
+                agents['factcheck']['client'],
+                f"Fact-check these findings: {results[-1]}"
+            )
+            results.append(f"✅ Fact-check: {factcheck_result}")
+        
+        # Step 4: Quality assurance
+        if 'qa' in agents and results:
+            qa_result = await self._send_message(
+                agents['qa']['client'],
+                f"Assess the quality of this research: {' '.join(results)}"
+            )
+            results.append(f"🏆 QA: {qa_result}")
+        
+        return "\n\n".join(results)
+    
+    async def _send_message(self, client: A2AClient, message: str) -> str:
+        """Send message to A2A agent and return response."""
+        request = SendMessageRequest(
+            id=str(uuid4()),
+            params=MessageSendParams(
+                message={
+                    "role": "user",
+                    "parts": [{"kind": "text", "text": message}],
+                    "messageId": uuid4().hex,
+                }
+            ),
+        )
+        
+        response = await client.send_message(request)
+        
+        # Extract response text
+        response_text = ""
+        if hasattr(response, 'result') and response.result:
+            if hasattr(response.result, 'message') and response.result.message:
+                message_obj = response.result.message
+                if hasattr(message_obj, 'parts') and message_obj.parts:
+                    for part in message_obj.parts:
+                        if hasattr(part, 'text'):
+                            response_text += part.text
+        
+        return response_text
+
+async def main():
+    """Run the A2A multi-agent research system."""
+    orchestrator = A2AOrchestrator()
+    
+    research_topic = "The impact of quantum computing on cybersecurity"
+    
+    try:
+        result = await orchestrator.coordinate_research(research_topic)
+        
+        print("\n🎉 A2A Multi-Agent Research Complete!")
+        print("="*60)
+        print(result)
+        print("="*60)
+        
+    except Exception as e:
+        print(f"❌ A2A coordination failed: {e}")
+
+if __name__ == "__main__":
+    asyncio.run(main())</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+
+                    <h3>Agent Server with Custom Skills</h3>
+                    <div class="code-block">
+                        <pre><code># analysis_agent_server.py
+import asyncio
+from strands import Agent, tool
+from strands.multiagent.a2a import A2AServer
+from strands.models import BedrockModel
+
+@tool
+def structured_analysis(data: str) -> str:
+    """Perform structured analysis on research data."""
+    # Custom analysis logic
+    sections = data.split('\n\n')
+    analysis = {
+        'key_points': len(sections),
+        'complexity': 'high' if len(data) > 1000 else 'medium',
+        'structure': 'well-organized' if len(sections) > 3 else 'needs-improvement'
+    }
+    return f"Analysis: {analysis}"
+
+def create_analysis_agent():
+    """Create analysis agent with custom tools."""
+    model = BedrockModel(
+        model_id="us.anthropic.claude-3-7-sonnet-20250219-v1:0",
+        temperature=0.3
+    )
+    
+    agent = Agent(
+        name="AnalysisSpecialist",
+        model=model,
+        system_prompt="""You are an Analysis Specialist with advanced analytical capabilities.
+
+Use the structured_analysis tool to process research data systematically.
+Provide insights, patterns, and recommendations based on your analysis.""",
+        tools=[structured_analysis]
+    )
+    
+    return agent
+
+async def main():
+    """Start the Analysis Agent A2A server."""
+    analysis_agent = create_analysis_agent()
+    
+    server = A2AServer(
+        agent=analysis_agent,
+        host="localhost",
+        port=9002,
+        version="1.0.0"
+    )
+    
+    print("📊 Analysis Agent server ready on http://localhost:9002")
+    await server.serve_async()
+
+if __name__ == "__main__":
+    asyncio.run(main())</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                </section>
+
+                <section id="advanced-patterns" class="content-section">
+                    <h2>Advanced A2A Patterns</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="advanced-patterns-review" class="progress-checkbox" data-module="module5" data-step="patterns">
+                        <label for="advanced-patterns-review">Review advanced patterns</label>
+                    </div>
+
+                    <h3>Service Discovery and Health Checks</h3>
+                    <div class="code-block">
+                        <pre><code>async def health_check_agents(agent_urls: List[str]) -> Dict[str, bool]:
+    """Check health status of A2A agents."""
+    health_status = {}
+    
+    async with httpx.AsyncClient() as client:
+        for url in agent_urls:
+            try:
+                # Check agent card endpoint
+                response = await client.get(f
+"{url}/.well-known/agent.json")
+                if response.status_code == 200:
+                    health_status[url] = True
+                else:
+                    health_status[url] = False
+            except Exception:
+                health_status[url] = False
+    
+    return health_status</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+
+                    <h3>Load Balancing and Failover</h3>
+                    <div class="code-block">
+                        <pre><code>class A2ALoadBalancer:
+    """Load balancer for A2A agents."""
+    
+    def __init__(self, agent_urls: List[str]):
+        self.agent_urls = agent_urls
+        self.current_index = 0
+    
+    async def get_healthy_agent(self) -> str:
+        """Get next healthy agent URL using round-robin."""
+        health_status = await health_check_agents(self.agent_urls)
+        healthy_agents = [url for url, healthy in health_status.items() if healthy]
+        
+        if not healthy_agents:
+            raise Exception("No healthy agents available")
+        
+        # Round-robin selection
+        selected = healthy_agents[self.current_index % len(healthy_agents)]
+        self.current_index += 1
+        
+        return selected
+    
+    async def send_with_failover(self, message: str) -> str:
+        """Send message with automatic failover."""
+        for attempt in range(len(self.agent_urls)):
+            try:
+                agent_url = await self.get_healthy_agent()
+                # Send message to selected agent
+                return await self._send_message(agent_url, message)
+            except Exception as e:
+                if attempt == len(self.agent_urls) - 1:
+                    raise e
+                continue</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+
+                    <h3>Distributed Task Coordination</h3>
+                    <div class="code-block">
+                        <pre><code>class A2ATaskCoordinator:
+    """Coordinate complex tasks across multiple A2A agents."""
+    
+    async def parallel_processing(self, tasks: List[Dict]) -> List[str]:
+        """Process multiple tasks in parallel across agents."""
+        results = []
+        
+        # Create tasks for parallel execution
+        async_tasks = []
+        for task in tasks:
+            agent_url = task['agent_url']
+            message = task['message']
+            async_tasks.append(self._process_task(agent_url, message))
+        
+        # Execute all tasks concurrently
+        results = await asyncio.gather(*async_tasks, return_exceptions=True)
+        
+        return results
+    
+    async def sequential_pipeline(self, pipeline: List[Dict]) -> str:
+        """Process tasks in sequence, passing results between agents."""
+        current_result = pipeline[0]['initial_input']
+        
+        for step in pipeline:
+            agent_url = step['agent_url']
+            message_template = step['message_template']
+            
+            # Format message with previous result
+            message = message_template.format(input=current_result)
+            
+            # Send to next agent in pipeline
+            current_result = await self._send_message(agent_url, message)
+        
+        return current_result</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                </section>
+
+                <section id="common-issues" class="content-section">
+                    <h2>Common Issues & Solutions</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="common-issues-review" class="progress-checkbox" data-module="module5" data-step="issues">
+                        <label for="common-issues-review">Review common issues</label>
+                    </div>
+
+                    <h3>Issue: A2AAgent Not Found</h3>
+                    <div class="code-block">
+                        <pre><code>ImportError: cannot import name 'A2AAgent' from 'strands.multiagent.a2a'</code></pre>
+                    </div>
+                    <p><strong>Solution:</strong> Use A2AServer instead (A2AAgent doesn't exist in current SDK):</p>
+                    <div class="code-block">
+                        <pre><code># ❌ Incorrect (from outdated documentation)
+from strands.multiagent.a2a import A2AAgent
+
+# ✅ Correct (current implementation)
+from strands.multiagent.a2a import A2AServer
+
+# Create server, not agent wrapper
+server = A2AServer(agent=your_agent, host="localhost", port=9001)</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+
+                    <h3>Issue: A2A Dependencies Missing</h3>
+                    <div class="code-block">
+                        <pre><code>ModuleNotFoundError: No module named 'strands.multiagent.a2a'</code></pre>
+                    </div>
+                    <p><strong>Solution:</strong> Install A2A dependencies with correct packages:</p>
+                    <div class="code-block">
+                        <pre><code># Install with A2A support
+pip install 'strands-agents[a2a]' 'a2a-sdk[sqlite]' strands-agents-tools
+
+# Verify installation
+python3 -c "from strands.multiagent.a2a import A2AServer; print('A2A available')"</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+
+                    <h3>Issue: AWS Credentials Not Configured</h3>
+                    <div class="code-block">
+                        <pre><code>NoCredentialsError: Unable to locate credentials</code></pre>
+                    </div>
+                    <p><strong>Solution:</strong> Configure AWS credentials properly:</p>
+                    <div class="code-block">
+                        <pre><code># Configure AWS credentials
+aws configure
+
+# Or set environment variables
+export AWS_ACCESS_KEY_ID=your_access_key
+export AWS_SECRET_ACCESS_KEY=your_secret_key
+export AWS_DEFAULT_REGION=us-west-2
+
+# Verify credentials
+aws sts get-caller-identity</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+
+                    <h3>Issue: Bedrock Model Access Denied</h3>
+                    <div class="code-block">
+                        <pre><code>AccessDeniedException: User is not authorized to perform: bedrock:InvokeModel</code></pre>
+                    </div>
+                    <p><strong>Solution:</strong> Enable Claude 3.7 Sonnet in Bedrock console:</p>
+                    <div class="code-block">
+                        <pre><code># 1. Go to AWS Bedrock Console
+# 2. Navigate to Model Access
+# 3. Enable "Claude 3.7 Sonnet" model
+# 4. Wait for access to be granted (may take a few minutes)
+
+# Verify model access
+aws bedrock list-foundation-models --region us-west-2</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+
+                    <h3>Issue: Agent Card Not Accessible</h3>
+                    <div class="code-block">
+                        <pre><code>404 Not Found: /.well-known/agent.json</code></pre>
+                    </div>
+                    <p><strong>Solution:</strong> Verify server is running and accessible:</p>
+                    <div class="code-block">
+                        <pre><code># Test server accessibility
+curl http://localhost:9001/.well-known/agent.json
+
+# Check if server is running
+lsof -i :9001
+
+# Start server if not running
+python3 src/research_agent_server.py</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+
+                    <h3>Issue: Connection Timeouts</h3>
+                    <div class="code-block">
+                        <pre><code>asyncio.TimeoutError: Request timed out</code></pre>
+                    </div>
+                    <p><strong>Solution:</strong> Configure appropriate timeouts for Bedrock calls:</p>
+                    <div class="code-block">
+                        <pre><code># Configure HTTP client with longer timeouts
+timeout = httpx.Timeout(60.0, connect=10.0)
+async with httpx.AsyncClient(timeout=timeout) as client:
+    # A2A operations with extended timeout
+    resolver = A2ACardResolver(client, base_url)
+    agent_card = await resolver.get_agent_card()</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+
+                    <h3>Issue: Experimental API Changes</h3>
+                    <div class="code-block">
+                        <pre><code>AttributeError: 'A2AServer' object has no attribute 'some_method'</code></pre>
+                    </div>
+                    <p><strong>Solution:</strong> Pin dependency versions and implement defensive programming:</p>
+                    <div class="code-block">
+                        <pre><code># Pin specific versions to avoid breaking changes
+pip install strands-agents==0.2.1 a2a-sdk==0.2.11
+
+# Implement defensive programming
+try:
+    server = A2AServer(agent=agent, host="localhost", port=port)
+    logger.info("✅ A2AServer created successfully")
+except Exception as e:
+    logger.error(f"❌ A2AServer creation failed: {e}")
+    # Implement fallback or graceful degradation</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+                </section>
+
+                <section id="next-steps" class="content-section">
+                    <h2>Next Steps & Production Considerations</h2>
+                    <div class="step-checkbox">
+                        <input type="checkbox" id="next-steps-review" class="progress-checkbox" data-module="module5" data-step="next">
+                        <label for="next-steps-review">Review next steps</label>
+                    </div>
+
+                    <h3>Production Deployment</h3>
+                    <ul>
+                        <li><strong>Containerization:</strong> Deploy each agent as a separate Docker container</li>
+                        <li><strong>Service Mesh:</strong> Use Kubernetes or AWS ECS for orchestration</li>
+                        <li><strong>Load Balancing:</strong> Implement proper load balancing for agent clusters</li>
+                        <li><strong>Monitoring:</strong> Set up health checks, metrics, and alerting</li>
+                        <li><strong>Security:</strong> Implement authentication, authorization, and TLS</li>
+                    </ul>
+
+                    <h3>Scaling Patterns</h3>
+                    <div class="code-block">
+                        <pre><code># Docker Compose for A2A agents
+version: '3.8'
+services:
+  research-agent:
+    build: ./research-agent
+    ports:
+      - "9001:9001"
+    environment:
+      - AWS_REGION=us-east-1
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9001/.well-known/agent.json"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  analysis-agent:
+    build: ./analysis-agent
+    ports:
+      - "9002:9002"
+    environment:
+      - AWS_REGION=us-east-1
+    depends_on:
+      - research-agent</code></pre>
+                        <button class="copy-btn">Copy</button>
+                    </div>
+
+                    <h3>Advanced Features to Explore</h3>
+                    <ul>
+                        <li><strong>Event-Driven Architecture:</strong> Use message queues for asynchronous communication</li>
+                        <li><strong>State Management:</strong> Implement distributed state stores for complex workflows</li>
+                        <li><strong>Circuit Breakers:</strong> Add resilience patterns for fault tolerance</li>
+                        <li><strong>Observability:</strong> Implement distributed tracing and metrics</li>
+                        <li><strong>Auto-scaling:</strong> Dynamic scaling based on load and performance</li>
+                    </ul>
+
+                    <h3>Integration Opportunities</h3>
+                    <ul>
+                        <li><strong>API Gateway:</strong> Expose A2A agents through managed APIs</li>
+                        <li><strong>Event Streaming:</strong> Integrate with Kafka or AWS EventBridge</li>
+                        <li><strong>Database Integration:</strong> Add persistent storage for agent state</li>
+                        <li><strong>External APIs:</strong> Connect agents to third-party services</li>
+                        <li><strong>Workflow Engines:</strong> Integrate with workflow orchestration platforms</li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+
+        <section class="key-takeaways">
+            <div class="container">
+                <h2>Key Takeaways</h2>
+                <ul>
+                    <li>✅ <strong>A2A enables true agent decoupling</strong> - Independent processes with HTTP communication</li>
+                    <li>✅ <strong>Agent Cards provide service discovery</strong> - Automatic capability discovery</li>
+                    <li>✅ <strong>JSON-RPC 2.0 ensures interoperability</strong> - Standard protocol for agent communication</li>
+                    <li>✅ <strong>Fault isolation improves resilience</strong> - Individual agent failures don't cascade</li>
+                    <li>✅ <strong>Horizontal scaling is built-in</strong> - Scale agents independently based on demand</li>
+                </ul>
+                <div class="module-metadata">
+                    <p><strong>Time to Complete:</strong> 40 minutes</p>
+                    <p><strong>Difficulty:</strong> Expert</p>
+                    <p><strong>Prerequisites Met:</strong> ✅ Workshop Complete!</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="workshop-completion">
+            <div class="container">
+                <h2>🎉 Workshop Complete!</h2>
+                <p>Congratulations! You've mastered the full spectrum of AWS Strands agent development, from basic agents to advanced A2A architectures.</p>
+                
+                <div class="completion-summary">
+                    <h3>What You've Accomplished</h3>
+                    <div class="accomplishment-grid">
+                        <div class="accomplishment-card">
+                            <h4>Module 1: Hello Agent</h4>
+                            <p>✅ Created your first Strands agent with Bedrock</p>
+                        </div>
+                        <div class="accomplishment-card">
+                            <h4>Module 2: Custom Tools</h4>
+                            <p>✅ Extended agents with custom tools and MCP integration</p>
+                        </div>
+                        <div class="accomplishment-card">
+                            <h4>Module 3: Multi-Agent</h4>
+                            <p>✅ Built coordinated multi-agent systems with agents-as-tools</p>
+                        </div>
+                        <div class="accomplishment-card">
+                            <h4>Module 4: Deployment</h4>
+                            <p>✅ Deployed agents to AWS Lambda for production</p>
+                        </div>
+                        <div class="accomplishment-card">
+                            <h4>Module 5: Advanced</h4>
+                            <p>✅ Implemented A2A protocol for decoupled architectures</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="module-nav-buttons">
+                    <a href="module4.html" class="btn btn-secondary">← Previous: Module 4</a>
+                    <a href="../index.html" class="btn btn-primary">Return to Home</a>
+                </div>
+                <a href="../troubleshooting.html" class="btn btn-secondary">Need Help?</a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h2>AWS Strands Workshop</h2>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="../index.html">Home</a></li>
+                        <li><a href="../setup.html">Setup Guide</a></li>
+                        <li><a href="module5.html">Module 5: Advanced</a></li>
+                        <li><a href="../troubleshooting.html">Troubleshooting</a></li>
+                    </ul>
+                </div>
+                <div class="footer-resources">
+                    <h3>Additional Resources</h3>
+                    <ul>
+                        <li><a href="https://strandsagents.com/" target="_blank" rel="noopener noreferrer">AWS Strands SDK Documentation</a></li>
+                        <li><a href="https://docs.aws.amazon.com/bedrock/" target="_blank" rel="noopener noreferrer">Amazon Bedrock User Guide</a></li>
+                        <li><a href="https://modelcontextprotocol.io/" target="_blank" rel="noopener noreferrer">Model Context Protocol (MCP) Documentation</a></li>
+                        <li><a href="https://github.com/a2aproject/A2A" target="_blank" rel="noopener noreferrer">A2A Protocol Documentation</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 AWS Strands Workshop. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Prism.js for syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+    
+    <!-- Diagram Renderer for Interactive Visualizations -->
+    <script src="../scripts/diagram-renderer.js"></script>
+    
+    <!-- Main JavaScript functionality -->
+    <script src="../scripts/main.js"></script>
+</body>
+</html>

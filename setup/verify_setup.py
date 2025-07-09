@@ -204,6 +204,13 @@ def check_workshop_structure():
 def main():
     """Run all verification checks"""
     print("🔍 AWS Strands Workshop Setup Verification")
+    
+    # Detect if running in Codespaces
+    if os.getenv('CODESPACES'):
+        print("🚀 Running in GitHub Codespaces")
+    elif os.getenv('DEVCONTAINER'):
+        print("🐳 Running in Dev Container")
+    
     print("=" * 50)
     
     checks = [

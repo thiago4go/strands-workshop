@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup Guide - AWS Strands AI Agents Workshop</title>
+    <meta name="description" content="Installation and setup instructions for the AWS Strands AI Agents Workshop">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <header>
+        <nav class="main-nav">
+            <div class="container">
+                <div class="logo">
+                    <a href="index.html">
+                        <h1>AWS Strands Workshop</h1>
+                    </a>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="setup.html" class="active" aria-current="page">Setup Guide</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" aria-haspopup="true" aria-expanded="false">Modules</a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="modules/module1.html" role="menuitem">Module 1: Basics</a></li>
+                            <li><a href="modules/module2.html" role="menuitem">Module 2: Tools</a></li>
+                            <li><a href="modules/module3.html" role="menuitem">Module 3: Multi-Agent</a></li>
+                            <li><a href="modules/module4.html" role="menuitem">Module 4: Deployment</a></li>
+                            <li><a href="modules/module5.html" role="menuitem">Module 5: Advanced</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="troubleshooting.html">Troubleshooting</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="page-header">
+            <div class="container">
+                <h1>Setup Guide</h1>
+                <p>Complete installation and configuration instructions for the workshop</p>
+            </div>
+        </section>
+
+       
+        <section class="module-navigation">
+            <div class="container">
+                <nav class="module-nav">
+                    <ul class="setup-nav-links">
+                    <li><a href="#quick-start">🚀 Quick Start (Codespaces)</a></li>
+                    <li><a href="#prerequisites">Prerequisites</a></li>
+                    <li><a href="#environment-setup">Local Environment Setup</a></li>
+                    <li><a href="#aws-configuration">AWS Configuration</a></li>
+                    <li><a href="#api-keys">API Keys</a></li>
+                    <li><a href="#verification">Verification</a></li>
+                    <li><a href="#docker-setup">Docker Setup</a></li>
+                </ul>
+            </nav>
+            </div>
+        </section>
+
+        <div class="setup-content">
+            <div class="container">
+                <section id="quick-start" class="setup-section">
+                    <h2>🚀 Quick Start with GitHub Codespaces (Recommended)</h2>
+                    <div class="setup-card highlight-card">
+                        <div class="quick-start-intro">
+                            <h3>Zero-Setup Workshop Environment</h3>
+                            <p>Get started in under 2 minutes with a fully configured cloud development environment. No local installation required!</p>
+                        </div>
+
+                        <div class="codespaces-steps">
+                            <div class="step">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <h4>Fork the Repository</h4>
+                                    <p>Click the button below to fork the workshop repository to your GitHub account:</p>
+                                    <a href="https://github.com/thiago4go/strands-workshop/fork" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+                                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                            <path d="M5 3.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0zm0 2.122a2.25 2.25 0 1 0-1.5 0v.878A2.25 2.25 0 0 0 5.75 8.5h1.5v2.128a2.25 2.25 0 1 0 1.5 0V8.5h1.5a2.25 2.25 0 0 0 2.25-2.25v-.878a2.25 2.25 0 1 0-1.5 0v.878a.75.75 0 0 1-.75.75H8.5V6.5a.75.75 0 0 1-.75-.75V5.25a2.25 2.25 0 1 0-1.5 0v.5H5.75A.75.75 0 0 1 5 5.25v-.628z"/>
+                                        </svg>
+                                        Fork Repository
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="step">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <h4>Launch Codespace</h4>
+                                    <p>After forking, click the green "Code" button and select "Create codespace on main":</p>
+                                    <div class="code-block">
+                                        <pre><code># Or use the direct link after forking:
+# https://github.com/YOUR_USERNAME/strands-workshop</code></pre>
+                                    </div>
+                                    <p><strong>Alternative:</strong> Use the button below after forking:</p>
+                                    <a href="https://codespaces.new/thiago4go/strands-workshop" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+                                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                            <path d="M11.5 2a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 1 12.5v-9A1.5 1.5 0 0 1 2.5 2h9zM2.5 3a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-9z"/>
+                                            <path d="M6 7.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5zM6 9.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5z"/>
+                                        </svg>
+                                        Open in Codespaces
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="step">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <h4>Wait for Environment Setup</h4>
+                                    <p>Codespaces will automatically:</p>
+                                    <ul>
+                                        <li>✅ Install Python 3.10+ and all dependencies</li>
+                                        <li>✅ Set up AWS CLI and Docker</li>
+                                        <li>✅ Install Strands SDK and all required packages</li>
+                                        <li>✅ Pull MCP Docker images for advanced tools</li>
+                                        <li>✅ Configure Q CLI for Amazon Q integration</li>
+                                        <li>✅ Set up MCP Inspector UI for debugging</li>
+                                    </ul>
+                                    <p><em>This process takes 2-3 minutes. You'll see the setup progress in the terminal.</em></p>
+                                </div>
+                            </div>
+
+                            <div class="step">
+                                <div class="step-number">4</div>
+                                <div class="step-content">
+                                    <h4>Configure AWS Credentials</h4>
+                                    <p>Once the environment is ready, configure your AWS credentials:</p>
+                                    <div class="code-block">
+                                        <pre><code>aws configure</code></pre>
+                                        <button class="copy-btn" data-clipboard-target="#aws-codespace-setup">Copy</button>
+                                    </div>
+                                    <p>Then enable Claude 3.7 Sonnet in <a href="https://us-west-2.console.aws.amazon.com/bedrock/home?region=us-west-2#/modelaccess" target="_blank" rel="noopener noreferrer">AWS Bedrock Console</a></p>
+                                </div>
+                            </div>
+
+                            <div class="step">
+                                <div class="step-number">5</div>
+                                <div class="step-content">
+                                    <h4>Verify Setup & Start Workshop</h4>
+                                    <div class="code-block">
+                                        <pre><code># Verify everything is working
+python setup/verify_setup.py
+
+# Start with Module 1
+cd exercises/module1-basics
+python exercise1-hello-agent.py</code></pre>
+                                        <button class="copy-btn" data-clipboard-target="#verify-codespace">Copy</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="codespaces-benefits">
+                            <h3>Why Use Codespaces?</h3>
+                            <div class="benefits-grid">
+                                <div class="benefit">
+                                    <h4>🚀 Zero Setup</h4>
+                                    <p>No local installation required. Everything is pre-configured.</p>
+                                </div>
+                                <div class="benefit">
+                                    <h4>☁️ Cloud-Powered</h4>
+                                    <p>4-core CPU, 8GB RAM, and fast SSD storage included.</p>
+                                </div>
+                                <div class="benefit">
+                                    <h4>🔧 Pre-Configured</h4>
+                                    <p>All dependencies, tools, and Docker images ready to use.</p>
+                                </div>
+                                <div class="benefit">
+                                    <h4>🌐 Access Anywhere</h4>
+                                    <p>Works on any device with a web browser.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="codespaces-note">
+                            <p><strong>Note:</strong> GitHub provides 120 core-hours of Codespaces free per month for personal accounts. This workshop requires approximately 2-3 hours.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="prerequisites" class="setup-section">
+                    <h2>Prerequisites (Local Setup Only)</h2>
+                    <div class="setup-card">
+                        <p><em>Skip this section if you're using GitHub Codespaces (recommended above).</em></p>
+                        <h3>Required Software</h3>
+                        <ul>
+                            <li>Python 3.10 or higher</li>
+                            <li>Git</li>
+                            <li>Docker</li>
+                            <li>AWS CLI</li>
+                            <li>Visual Studio Code (recommended)</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section id="environment-setup" class="setup-section">
+                    <h2>Local Environment Setup</h2>
+                    <div class="setup-card">
+                        <p><em>Skip this section if you're using GitHub Codespaces (recommended above).</em></p>
+                        <h3>Repository Setup</h3>
+                        <div class="code-block">
+                            <pre><code># Fork and clone your repository
+git clone https://github.com/YOUR_USERNAME/strands-workshop.git
+cd strands-workshop</code></pre>
+                            <button class="copy-btn" data-clipboard-target="#repo-setup">Copy</button>
+                        </div>
+
+                        <h3>Virtual Environment</h3>
+                        <div class="code-block">
+                            <pre><code># Create virtual environment
+python -m venv .venv
+
+# Activate on macOS/Linux
+source .venv/bin/activate
+
+# Activate on Windows
+.venv\Scripts\activate</code></pre>
+                            <button class="copy-btn" data-clipboard-target="#venv-setup">Copy</button>
+                        </div>
+
+                        <h3>Install Dependencies</h3>
+                        <div class="code-block">
+                            <pre><code># Install all dependencies
+pip install -r requirements.txt</code></pre>
+                            <button class="copy-btn" data-clipboard-target="#dependencies-setup">Copy</button>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="aws-configuration" class="setup-section">
+                    <h2>AWS Configuration</h2>
+                    <div class="setup-card">
+                        <h3>Configure AWS CLI</h3>
+                        <div class="code-block">
+                            <pre><code>aws configure</code></pre>
+                            <button class="copy-btn" data-clipboard-target="#aws-cli-setup">Copy</button>
+                        </div>
+                        <p>You will be prompted to enter:</p>
+                        <ul>
+                            <li>AWS Access Key ID</li>
+                            <li>AWS Secret Access Key</li>
+                            <li>Default region name (recommended: us-west-2)</li>
+                            <li>Default output format (json)</li>
+                        </ul>
+
+                        <h3>Enable Claude 3.7 Sonnet in AWS Bedrock</h3>
+                        <ol>
+                            <li>Go to the <a href="https://us-west-2.console.aws.amazon.com/bedrock/home?region=us-west-2#/modelaccess" target="_blank" rel="noopener noreferrer">AWS Bedrock Console</a></li>
+                            <li>Click on "Model access"</li>
+                            <li>Find "Claude 3.7 Sonnet" and click "Edit"</li>
+                            <li>Toggle the access switch to "On"</li>
+                            <li>Click "Save changes"</li>
+                        </ol>
+                    </div>
+                </section>
+
+                <section id="api-keys" class="setup-section">
+                    <h2>API Keys (Optional)</h2>
+                    <div class="setup-card">
+                        <h3>Environment Variables</h3>
+                        <p>Create a <code>.env</code> file in the workshop root directory:</p>
+                        <div class="code-block">
+                            <pre><code># AWS (configured via aws configure)
+AWS_REGION=us-east-1
+
+# Optional API Keys
+OPENAI_API_KEY=sk-...
+NVIDIA_API_KEY=nvapi-...
+OPENROUTER_API_KEY=sk-or-...</code></pre>
+                            <button class="copy-btn" data-clipboard-target="#env-setup">Copy</button>
+                        </div>
+
+                        <h3>API Key Sources</h3>
+                        <ul>
+                            <li><a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer">OpenAI API Keys</a></li>
+                            <li><a href="https://build.nvidia.com/" target="_blank" rel="noopener noreferrer">NVIDIA NIM API Keys</a></li>
+                            <li><a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer">OpenRouter API Keys</a></li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section id="verification" class="setup-section">
+                    <h2>Verification</h2>
+                    <div class="setup-card">
+                        <h3>Verify Setup</h3>
+                        <div class="code-block">
+                            <pre><code>python setup/verify_setup.py</code></pre>
+                            <button class="copy-btn" data-clipboard-target="#verify-setup">Copy</button>
+                        </div>
+
+                        <h3>Test Provider Access</h3>
+                        <div class="code-block">
+                            <pre><code>python setup/test_providers.py</code></pre>
+                            <button class="copy-btn" data-clipboard-target="#test-providers">Copy</button>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="docker-setup" class="setup-section">
+                    <h2>Docker Setup</h2>
+                    <div class="setup-card">
+                        <h3>Docker Installation</h3>
+                        <p>Docker is required for MCP server integration. Follow the installation instructions for your platform:</p>
+                        <ul>
+                            <li><a href="https://docs.docker.com/desktop/install/mac-install/" target="_blank" rel="noopener noreferrer">Docker Desktop for Mac</a></li>
+                            <li><a href="https://docs.docker.com/desktop/install/windows-install/" target="_blank" rel="noopener noreferrer">Docker Desktop for Windows</a></li>
+                            <li><a href="https://docs.docker.com/engine/install/ubuntu/" target="_blank" rel="noopener noreferrer">Docker Engine for Ubuntu</a></li>
+                        </ul>
+
+                        <h3>Verify Docker Installation</h3>
+                        <div class="code-block">
+                            <pre><code>docker --version</code></pre>
+                            <button class="copy-btn" data-clipboard-target="#docker-verify">Copy</button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <section class="next-steps">
+            <div class="container">
+                <h2>Next Steps</h2>
+                <p>Choose your preferred setup method and start the workshop!</p>
+                <div class="next-steps-buttons">
+                    <a href="https://github.com/thiago4go/strands-workshop/fork" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M5 3.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0zm0 2.122a2.25 2.25 0 1 0-1.5 0v.878A2.25 2.25 0 0 0 5.75 8.5h1.5v2.128a2.25 2.25 0 1 0 1.5 0V8.5h1.5a2.25 2.25 0 0 0 2.25-2.25v-.878a2.25 2.25 0 1 0-1.5 0v.878a.75.75 0 0 1-.75.75H8.5V6.5a.75.75 0 0 1-.75-.75V5.25a2.25 2.25 0 1 0-1.5 0v.5H5.75A.75.75 0 0 1 5 5.25v-.628z"/>
+                        </svg>
+                        🚀 Quick Start with Codespaces
+                    </a>
+                    <a href="modules/module1.html" class="btn btn-secondary">Start Module 1: Hello Agent</a>
+                    <a href="troubleshooting.html" class="btn btn-secondary">Troubleshooting Guide</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h2>AWS Strands Workshop</h2>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="setup.html">Setup Guide</a></li>
+                        <li><a href="modules/module1.html">Module 1: Basics</a></li>
+                        <li><a href="troubleshooting.html">Troubleshooting</a></li>
+                    </ul>
+                </div>
+                <div class="footer-resources">
+                    <h3>Additional Resources</h3>
+                    <ul>
+                        <li><a href="https://strandsagents.com/" target="_blank" rel="noopener noreferrer">AWS Strands SDK Documentation</a></li>
+                        <li><a href="https://docs.aws.amazon.com/bedrock/" target="_blank" rel="noopener noreferrer">Amazon Bedrock User Guide</a></li>
+                        <li><a href="https://modelcontextprotocol.io/" target="_blank" rel="noopener noreferrer">Model Context Protocol (MCP) Documentation</a></li>
+                        <li><a href="https://github.com/a2aproject/A2A" target="_blank" rel="noopener noreferrer">A2A Protocol Documentation</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 AWS Strands Workshop. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Prism.js for syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+    
+    <!-- Main JavaScript functionality -->
+    <script src="scripts/main.js"></script>
+</body>
+</html>
