@@ -1518,6 +1518,91 @@
     }
 
     // ==========================================================================
+    // Theme Management
+    // ==========================================================================
+
+    class ThemeManager {
+        constructor() {
+            this.initializeThemeToggle();
+        }
+
+        initializeThemeToggle() {
+            // Create theme toggle button if it doesn't exist
+            this.createThemeToggleButton();
+            
+            // Load saved theme preference
+            this.loadThemePreference();
+            
+            // Listen for system preference changes
+            this.listenForSystemPreferenceChanges();
+        }
+
+        createThemeToggleButton() {
+            const nav = document.querySelector('.nav-links');
+            if (!nav || document.querySelector('.theme-toggle')) return;
+
+            const themeToggleItem = document.createElement('li');
+            const themeToggle = document.createElement('button');
+            themeToggle.className = 'theme-toggle';
+            themeToggle.setAttribute('aria-label', 'Toggle dark mode');
+            themeToggle.innerHTML = `
+                <span class="theme-toggle-icon light">☀️</span>
+                <span class="theme-toggle-icon dark">🌙</span>
+            `;
+
+            themeToggle.addEventListener('click', () => {
+                this.toggleTheme();
+            });
+
+            themeToggleItem.appendChild(themeToggle);
+            nav.appendChild(themeToggleItem);
+        }
+
+        loadThemePreference() {
+            const savedTheme = Storage.get('theme');
+            
+            if (savedTheme) {
+                // Apply saved theme preference
+                this.setTheme(savedTheme);
+            } else {
+                // Check system preference
+                const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                this.setTheme(prefersDarkMode ? 'dark' : 'light');
+            }
+        }
+
+        listenForSystemPreferenceChanges() {
+            // Only apply system changes if user hasn't set a preference
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                if (!Storage.get('theme')) {
+                    this.setTheme(e.matches ? 'dark' : 'light');
+                }
+            });
+        }
+
+        toggleTheme() {
+            const currentTheme = document.documentElement.classList.contains('dark-mode') ? 'dark' : 'light';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            this.setTheme(newTheme);
+            Storage.set('theme', newTheme);
+            
+            // Announce theme change for screen readers
+            announceToScreenReader(`${newTheme} mode activated`);
+        }
+
+        setTheme(theme) {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark-mode');
+                document.querySelector('.theme-toggle')?.setAttribute('aria-pressed', 'true');
+            } else {
+                document.documentElement.classList.remove('dark-mode');
+                document.querySelector('.theme-toggle')?.setAttribute('aria-pressed', 'false');
+            }
+        }
+    }
+
+    // ==========================================================================
     // Main Application Class
     // ==========================================================================
 
@@ -1554,6 +1639,7 @@
                 this.components.codeBlockManager = new CodeBlockManager();
                 this.components.diagramManager = new DiagramManager();
                 this.components.performanceManager = new PerformanceManager();
+                this.components.themeManager = new ThemeManager();
 
                 // Initialize page-specific features
                 this.initializePageSpecificFeatures();

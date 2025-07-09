@@ -2054,6 +2054,64 @@ footer {
   min-width: 200px;
 }
 
+/* Theme Toggle Button */
+.theme-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  position: relative;
+  width: 40px;
+  height: 40px;
+  margin-left: var(--space-2);
+}
+
+.theme-toggle:hover {
+  background-color: var(--gray-50);
+}
+
+.theme-toggle:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+.theme-toggle-icon {
+  font-size: 1.2rem;
+  transition: all var(--transition-normal);
+}
+
+.theme-toggle-icon.light {
+  opacity: 1;
+  position: absolute;
+}
+
+.theme-toggle-icon.dark {
+  opacity: 0;
+  position: absolute;
+  transform: rotate(360deg) scale(0);
+}
+
+/* Dark mode toggle state */
+.dark-mode .theme-toggle-icon.light {
+  opacity: 0;
+  transform: rotate(-360deg) scale(0);
+}
+
+.dark-mode .theme-toggle-icon.dark {
+  opacity: 1;
+  transform: rotate(0) scale(1);
+}
+
+/* Force dark mode regardless of system preference */
+html.dark-mode {
+  color-scheme: dark;
+}
+
 .dropdown.active .dropdown-menu {
   opacity: 1;
   visibility: visible;
@@ -2436,12 +2494,351 @@ pre[class*="language-"]::before {
   }
 }
 
-/* Dark Mode Support (if implemented) */
+/* Dark Mode Support */
 @media (prefers-color-scheme: dark) {
   :root {
+    /* Color Palette - Technical/AI Theme */
     --primary-color: #4da6ff;
-    --gray-800: #f8f9fa;
-    --gray-700: #e9ecef;
+    --primary-dark: #3a80cc;
+    --primary-light: #70b8ff;
+    --secondary-color: #3cb371;
+    --secondary-dark: #2e8b57;
+    --secondary-light: #5fd38d;
+    
+    /* Accent Colors */
+    --accent-purple: #9370db;
+    --accent-teal: #40e0d0;
+    --accent-orange: #ff9f40;
+    --accent-red: #ff6b6b;
+    
+    /* Neutral Colors - Inverted for dark mode */
     --white: #212529;
+    --gray-50: #343a40;
+    --gray-100: #495057;
+    --gray-200: #6c757d;
+    --gray-300: #adb5bd;
+    --gray-400: #ced4da;
+    --gray-500: #dee2e6;
+    --gray-600: #e9ecef;
+    --gray-700: #f1f3f5;
+    --gray-800: #f8f9fa;
+    --gray-900: #ffffff;
+    
+    /* Semantic Colors */
+    --success-color: #4caf50;
+    --success-bg: #1e3b1e;
+    --success-border: #2e5a2e;
+    --warning-color: #ffca28;
+    --warning-bg: #3d2e08;
+    --warning-border: #5c4415;
+    --error-color: #ff5252;
+    --error-bg: #3d1515;
+    --error-border: #5c2323;
+    --info-color: #42a5f5;
+    --info-bg: #0d2b45;
+    --info-border: #1a4469;
+    
+    /* Interactive Elements */
+    --focus-color: #4da6ff;
+    --focus-shadow: 0 0 0 3px rgba(77, 166, 255, 0.5);
+    
+    /* Shadows - Adjusted for dark mode */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --shadow-base: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6), 0 4px 6px -2px rgba(0, 0, 0, 0.5);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.7), 0 10px 10px -5px rgba(0, 0, 0, 0.6);
   }
+  
+  /* Override specific component styles for dark mode */
+  body {
+    color: var(--gray-300);
+    background-color: var(--white);
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--gray-900);
+  }
+  
+  a:hover,
+  a:focus {
+    color: var(--primary-light);
+  }
+  
+  code {
+    background-color: var(--gray-50);
+  }
+  
+  header {
+    background-color: var(--gray-50);
+    border-bottom: 1px solid var(--gray-200);
+  }
+  
+  .logo a {
+    color: var(--gray-900);
+  }
+  
+  .nav-links a:hover,
+  .nav-links a:focus {
+    background-color: var(--gray-100);
+  }
+  
+  .dropdown-menu {
+    background-color: var(--gray-50);
+    border: 1px solid var(--gray-200);
+  }
+  
+  .dropdown-menu a:hover,
+  .dropdown-menu a:focus {
+    background-color: var(--gray-100);
+  }
+  
+  .card,
+  .module-card,
+  .setup-card,
+  .step,
+  .benefit,
+  .overview-item,
+  .prerequisite-group,
+  .technology-item,
+  .issue-item {
+    background-color: var(--gray-50);
+    border-color: var(--gray-200);
+  }
+  
+  .card-header,
+  .card-footer {
+    background-color: var(--gray-100);
+    border-color: var(--gray-200);
+  }
+  
+  .module-card:hover,
+  .technology-item:hover,
+  .overview-item:hover {
+    border-color: var(--primary-light);
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .code-block {
+    background-color: #1e1e1e;
+    border-color: #333;
+  }
+  
+  .code-block pre {
+    color: #e0e0e0;
+  }
+  
+  .code-block code {
+    color: #e0e0e0;
+    background-color: transparent;
+  }
+  
+  /* Syntax highlighting for dark mode */
+  .token.comment { color: #6a9955; }
+  .token.keyword { color: #569cd6; font-weight: bold; }
+  .token.string { color: #ce9178; }
+  .token.number { color: #b5cea8; }
+  .token.function { color: #dcdcaa; }
+  .token.operator { color: #d4d4d4; }
+  
+  /* Collapsible sections */
+  .collapsible-header {
+    background-color: var(--gray-100);
+  }
+  
+  .collapsible-header:hover {
+    background-color: var(--gray-200);
+  }
+  
+  .collapsible-content {
+    background-color: var(--gray-50);
+  }
+  
+  /* Footer */
+  footer {
+    background-color: #1a1a1a;
+    color: var(--gray-400);
+  }
+  
+  /* Error and notification styles */
+  .error-toast {
+    background: var(--error-color);
+    color: var(--white);
+  }
+  
+  /* Progress bar */
+  .progress-bar {
+    background-color: var(--gray-200);
+  }
+}
+
+/* Class-based Dark Mode Support */
+html.dark-mode {
+  /* Color Palette - Technical/AI Theme */
+  --primary-color: #4da6ff;
+  --primary-dark: #3a80cc;
+  --primary-light: #70b8ff;
+  --secondary-color: #3cb371;
+  --secondary-dark: #2e8b57;
+  --secondary-light: #5fd38d;
+  
+  /* Accent Colors */
+  --accent-purple: #9370db;
+  --accent-teal: #40e0d0;
+  --accent-orange: #ff9f40;
+  --accent-red: #ff6b6b;
+  
+  /* Neutral Colors - Inverted for dark mode */
+  --white: #212529;
+  --gray-50: #343a40;
+  --gray-100: #495057;
+  --gray-200: #6c757d;
+  --gray-300: #adb5bd;
+  --gray-400: #ced4da;
+  --gray-500: #dee2e6;
+  --gray-600: #e9ecef;
+  --gray-700: #f1f3f5;
+  --gray-800: #f8f9fa;
+  --gray-900: #ffffff;
+  
+  /* Semantic Colors */
+  --success-color: #4caf50;
+  --success-bg: #1e3b1e;
+  --success-border: #2e5a2e;
+  --warning-color: #ffca28;
+  --warning-bg: #3d2e08;
+  --warning-border: #5c4415;
+  --error-color: #ff5252;
+  --error-bg: #3d1515;
+  --error-border: #5c2323;
+  --info-color: #42a5f5;
+  --info-bg: #0d2b45;
+  --info-border: #1a4469;
+  
+  /* Interactive Elements */
+  --focus-color: #4da6ff;
+  --focus-shadow: 0 0 0 3px rgba(77, 166, 255, 0.5);
+  
+  /* Shadows - Adjusted for dark mode */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-base: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6), 0 4px 6px -2px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.7), 0 10px 10px -5px rgba(0, 0, 0, 0.6);
+  
+  /* Override specific component styles for dark mode */
+  color-scheme: dark;
+}
+
+html.dark-mode body {
+  color: var(--gray-300);
+  background-color: var(--white);
+}
+
+html.dark-mode h1,
+html.dark-mode h2,
+html.dark-mode h3,
+html.dark-mode h4,
+html.dark-mode h5,
+html.dark-mode h6 {
+  color: var(--gray-900);
+}
+
+html.dark-mode a:hover,
+html.dark-mode a:focus {
+  color: var(--primary-light);
+}
+
+html.dark-mode code {
+  background-color: var(--gray-50);
+}
+
+html.dark-mode header {
+  background-color: var(--gray-50);
+  border-bottom: 1px solid var(--gray-200);
+}
+
+html.dark-mode .logo a {
+  color: var(--gray-900);
+}
+
+html.dark-mode .nav-links a:hover,
+html.dark-mode .nav-links a:focus {
+  background-color: var(--gray-100);
+}
+
+html.dark-mode .dropdown-menu {
+  background-color: var(--gray-50);
+  border: 1px solid var(--gray-200);
+}
+
+html.dark-mode .dropdown-menu a:hover,
+html.dark-mode .dropdown-menu a:focus {
+  background-color: var(--gray-100);
+}
+
+html.dark-mode .card,
+html.dark-mode .module-card,
+html.dark-mode .setup-card,
+html.dark-mode .step,
+html.dark-mode .benefit,
+html.dark-mode .overview-item,
+html.dark-mode .prerequisite-group,
+html.dark-mode .technology-item,
+html.dark-mode .issue-item {
+  background-color: var(--gray-50);
+  border-color: var(--gray-200);
+}
+
+html.dark-mode .card-header,
+html.dark-mode .card-footer {
+  background-color: var(--gray-100);
+  border-color: var(--gray-200);
+}
+
+html.dark-mode .module-card:hover,
+html.dark-mode .technology-item:hover,
+html.dark-mode .overview-item:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-lg);
+}
+
+html.dark-mode .code-block {
+  background-color: #1e1e1e;
+  border-color: #333;
+}
+
+html.dark-mode .code-block pre {
+  color: #e0e0e0;
+}
+
+html.dark-mode .code-block code {
+  color: #e0e0e0;
+  background-color: transparent;
+}
+
+html.dark-mode .collapsible-header {
+  background-color: var(--gray-100);
+}
+
+html.dark-mode .collapsible-header:hover {
+  background-color: var(--gray-200);
+}
+
+html.dark-mode .collapsible-content {
+  background-color: var(--gray-50);
+}
+
+html.dark-mode footer {
+  background-color: #1a1a1a;
+  color: var(--gray-400);
+}
+
+html.dark-mode .error-toast {
+  background: var(--error-color);
+  color: var(--white);
+}
+
+html.dark-mode .progress-bar {
+  background-color: var(--gray-200);
 }
